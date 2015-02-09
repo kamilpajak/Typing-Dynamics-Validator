@@ -29,7 +29,7 @@ int main(void) {
   while (1) {
     numberOfBytesRead = read(fileDescriptor, &event, sizeof event);
 
-    if (numberOfBytesRead == (ssize_t) - 1) {
+    if (numberOfBytesRead == (ssize_t)-1) {
       if (errno == EINTR)
         continue;
       else
