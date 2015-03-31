@@ -18,6 +18,13 @@ void printEvent(input_event event) {
          (long)event.time.tv_sec, (long)event.time.tv_usec);
 }
 
+struct keystroke
+{
+  int keyCode;
+  double keyDownTime;
+  double keyUpTime;
+};
+
 int main(void) {
   const char *devicePath = "/dev/input/by-id/"
                            "usb-Microsft_Microsoft_Wireless_Desktop_Receiver_3."
@@ -28,6 +35,8 @@ int main(void) {
     fprintf(stderr, "Cannot open %s: %s\n", devicePath, strerror(errno));
     return EXIT_FAILURE;
   }
+
+  std::vector<keystroke> keystrokes;
 
   while (1) {
     struct input_event event;
@@ -46,7 +55,6 @@ int main(void) {
     }
 
     if (event.type == EV_KEY && event.value >= 0 && event.value <= 1) {
-      // events.push_back(event);
       printEvent(event);
     }
   }
