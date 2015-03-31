@@ -6,9 +6,15 @@
 #include <string.h>
 #include <stdio.h>
 #include <vector>
+#include <string>
 
 void printEvent(input_event event) {
-  printf("%d | %3d | %ld.%06ld\n", event.value, event.code,
+  std::string keyState;
+  if (event.value == 0)
+    keyState = "RELEASED";
+  if (event.value == 1)
+    keyState = "PRESSED";
+  printf("%-8s | %3d | %ld.%06ld\n", keyState.c_str(), event.code,
          (long)event.time.tv_sec, (long)event.time.tv_usec);
 }
 
@@ -16,9 +22,6 @@ int main(void) {
   const char *devicePath = "/dev/input/by-id/"
                            "usb-Microsft_Microsoft_Wireless_Desktop_Receiver_3."
                            "1-event-kbd";
-  struct input_event event;
-  std::vector<input_event> events;
-  ssize_t numberOfBytesRead;
   int fileDescriptor = open(devicePath, O_RDONLY);
 
   if (fileDescriptor == -1) {
@@ -27,7 +30,8 @@ int main(void) {
   }
 
   while (1) {
-    numberOfBytesRead = read(fileDescriptor, &event, sizeof event);
+    struct input_event event;
+    ssize_t numberOfBytesRead = read(fileDescriptor, &event, sizeof event);
 
     if (numberOfBytesRead == (ssize_t)-1) {
       if (errno == EINTR)
@@ -42,7 +46,7 @@ int main(void) {
     }
 
     if (event.type == EV_KEY && event.value >= 0 && event.value <= 1) {
-      events.push_back(event);
+      // events.push_back(event);
       printEvent(event);
     }
   }
