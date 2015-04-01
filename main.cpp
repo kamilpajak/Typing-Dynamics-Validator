@@ -37,9 +37,12 @@ int main(void) {
     return EXIT_FAILURE;
   }
 
+  std::vector<input_event> events;
   std::vector<keystroke> keystrokes;
+
   int counter = 0;
-  while (counter < 10) {
+
+  while (counter < 90) {
     struct input_event event;
     ssize_t numberOfBytesRead = read(fileDescriptor, &event, sizeof event);
 
@@ -55,32 +58,34 @@ int main(void) {
       break;
     }
 
-    if (event.type == EV_KEY) {
-      char buffer[18];
-      sprintf(buffer, "%ld.%06ld", (long)event.time.tv_sec,
-              (long)event.time.tv_usec);
-      double timestamp = atof(buffer);
+    if (event.type == EV_KEY && (event.value == 0 || event.value == 1)) {
+      events.push_back(event);
+      printEvent(event);
+      counter++;
 
-      if (event.value == 1) { // Klawisz wciśnięto
-        keystroke caughtKeystroke;
-        caughtKeystroke.keyCode = event.code;
-        caughtKeystroke.keyDownTime = timestamp;
-        caughtKeystroke.keyUpTime = 0;
-
-        keystrokes.push_back(caughtKeystroke);
-      }
-
-      if (event.value == 0) { // Klawisz puszczono
-        for (int i = 0; i < keystrokes.size(); i++)
-          if (keystrokes[i].keyCode == event.code &&
-              keystrokes[i].keyUpTime == 0) {
-            keystrokes[i].keyUpTime = timestamp;
-            counter++;
-            break;
-          }
-      }
     }
   }
+
+  for (int i = 0; i < events.size() - 1; i++)
+    if (events[i].value == 1)
+      for (int j = i + 1; j < events.size(); j++)
+        if (events[i].code == events[j].code) {
+
+          char bufferKeyDownTime[128];
+          sprintf(bufferKeyDownTime, "%ld.%06ld", (long)events[i].time.tv_sec, (long)events[i].time.tv_usec);
+          double keyDownTime = atof(bufferKeyDownTime);
+
+          char bufferKeyUpTime[128];
+          sprintf(bufferKeyUpTime, "%ld.%06ld", (long)events[j].time.tv_sec, (long)events[j].time.tv_usec);
+          double keyUpTime = atof(bufferKeyUpTime);
+
+          keystroke caughtKeystroke;
+          caughtKeystroke.keyCode = events[i].code;
+          caughtKeystroke.keyDownTime = keyDownTime;
+          caughtKeystroke.keyUpTime = keyUpTime;
+          keystrokes.push_back(caughtKeystroke);
+          break;
+        }
 
   for (int i = 0; i < keystrokes.size(); i++) {
     printf("Key Code:  %i\n", keystrokes[i].keyCode);
