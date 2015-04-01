@@ -62,7 +62,6 @@ int main(void) {
       events.push_back(event);
       printEvent(event);
       counter++;
-
     }
   }
 
@@ -72,11 +71,13 @@ int main(void) {
         if (events[i].code == events[j].code) {
 
           char bufferKeyDownTime[128];
-          sprintf(bufferKeyDownTime, "%ld.%06ld", (long)events[i].time.tv_sec, (long)events[i].time.tv_usec);
+          sprintf(bufferKeyDownTime, "%ld.%06ld", (long)events[i].time.tv_sec,
+                  (long)events[i].time.tv_usec);
           double keyDownTime = atof(bufferKeyDownTime);
 
           char bufferKeyUpTime[128];
-          sprintf(bufferKeyUpTime, "%ld.%06ld", (long)events[j].time.tv_sec, (long)events[j].time.tv_usec);
+          sprintf(bufferKeyUpTime, "%ld.%06ld", (long)events[j].time.tv_sec,
+                  (long)events[j].time.tv_usec);
           double keyUpTime = atof(bufferKeyUpTime);
 
           keystroke caughtKeystroke;
@@ -97,4 +98,3 @@ int main(void) {
   fprintf(stderr, "%s\n", strerror(errno));
   return EXIT_FAILURE;
 }
-
