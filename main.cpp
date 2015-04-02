@@ -22,16 +22,10 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
     if (events[i].value == 1)
       for (int j = i + 1; j < events.size(); j++)
         if (events[i].code == events[j].code) {
-
-          char bufferKeyDownTime[128];
-          sprintf(bufferKeyDownTime, "%ld.%06ld", (long)events[i].time.tv_sec,
-                  (long)events[i].time.tv_usec);
-          double keyDownTime = atof(bufferKeyDownTime);
-
-          char bufferKeyUpTime[128];
-          sprintf(bufferKeyUpTime, "%ld.%06ld", (long)events[j].time.tv_sec,
-                  (long)events[j].time.tv_usec);
-          double keyUpTime = atof(bufferKeyUpTime);
+          double keyDownTime =
+              events[i].time.tv_sec + (double)events[i].time.tv_usec / 1000000;
+          double keyUpTime =
+              events[j].time.tv_sec + (double)events[j].time.tv_usec / 1000000;
 
           keystroke caughtKeystroke;
           caughtKeystroke.keyCode = events[i].code;
