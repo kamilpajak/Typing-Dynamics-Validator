@@ -8,13 +8,18 @@
 #include <vector>
 #include <string>
 
+// --- KEYSTROKE --- //
+
 struct keystroke {
   int keyCode;
   double keyDownTime;
   double keyUpTime;
 };
 
-// Wyciągnij listę keystrokes z listy zdarzeń klawiatury
+// ----------------- //
+
+// ---- FUNKCJE ---- //
+
 std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   std::vector<keystroke> keystrokes;
 
@@ -38,7 +43,6 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   return keystrokes;
 }
 
-// Wyciągnij listę czasów DD z listy keystrokes
 std::vector<double> takeDownDownLatencies(std::vector<keystroke> keystrokes) {
   std::vector<double> downDownLatencies;
   for (int i = 1; i < keystrokes.size(); i++) {
@@ -50,6 +54,27 @@ std::vector<double> takeDownDownLatencies(std::vector<keystroke> keystrokes) {
   return downDownLatencies;
 }
 
+std::vector<double> takeUpDownLatencies(std::vector<keystroke> keystrokes) {
+  std::vector<double> upDownLatencies;
+  for (int i = 1; i < keystrokes.size(); i++) {
+    double upDownLatency =
+        keystrokes[i].keyDownTime - keystrokes[i - 1].keyUpTime;
+    upDownLatencies.push_back(upDownLatency);
+  }
+
+  return upDownLatencies;
+}
+
+std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
+  std::vector<double> downUpLatencies;
+  for (int i = 0; i < keystrokes.size(); i++) {
+    double downUpLatency = keystrokes[i].keyUpTime - keystrokes[i].keyDownTime;
+    downUpLatencies.push_back(downUpLatency);
+  }
+
+  return downUpLatencies;
+}
+
 void printEvent(input_event event) {
   std::string keyState;
   if (event.value == 0)
@@ -59,6 +84,8 @@ void printEvent(input_event event) {
   printf("%-8s | %3d | %ld.%06ld\n", keyState.c_str(), event.code,
          (long)event.time.tv_sec, (long)event.time.tv_usec);
 }
+
+// *** GŁÓWNA FUNKCJA *** //
 
 int main(void) {
   const char *devicePath = "/dev/input/by-id/"
@@ -108,7 +135,7 @@ int main(void) {
     printf("Key Up:    %f\n\n", keystrokes[i].keyUpTime);
   }
 
-  takeDownDownLatencies(keystrokes);
+  takeDownUpLatencies(keystrokes);
 
   fflush(stdout);
   fprintf(stderr, "%s\n", strerror(errno));
