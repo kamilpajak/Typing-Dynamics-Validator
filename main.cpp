@@ -20,6 +20,8 @@ struct keystroke {
 
 // ---- FUNKCJE ---- //
 
+// Keystroke Data //
+
 std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   std::vector<keystroke> keystrokes;
 
@@ -41,6 +43,16 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
         }
 
   return keystrokes;
+}
+
+// Features //
+
+std::vector<int> takeKeyCodes(std::vector<keystroke> keystrokes) {
+  std::vector<int> keyCodes;
+  for (int i = 0; i < keystrokes.size(); i++)
+    keyCodes.push_back(keystrokes[i].keyCode);
+
+  return keyCodes;
 }
 
 std::vector<double> takeDownDownLatencies(std::vector<keystroke> keystrokes) {
@@ -74,6 +86,12 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 
   return downUpLatencies;
 }
+
+// Template //
+
+// Classifier //
+
+// Others //
 
 void printEvent(input_event event) {
   std::string keyState;
