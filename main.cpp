@@ -14,7 +14,7 @@ struct keystroke {
   double keyUpTime;
 };
 
-// Wyciągnij keystrokes z listy zdarzeń klawiatury
+// Wyciągnij listę keystrokes z listy zdarzeń klawiatury
 std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   std::vector<keystroke> keystrokes;
 
@@ -36,6 +36,18 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
         }
 
   return keystrokes;
+}
+
+// Wyciągnij listę czasów DD z listy keystrokes
+std::vector<double> takeDownDownLatencies(std::vector<keystroke> keystrokes) {
+  std::vector<double> downDownLatencies;
+  for (int i = 1; i < keystrokes.size(); i++) {
+    double downDownLatency =
+        keystrokes[i].keyDownTime - keystrokes[i - 1].keyDownTime;
+    downDownLatencies.push_back(downDownLatency);
+  }
+
+  return downDownLatencies;
 }
 
 void printEvent(input_event event) {
@@ -95,6 +107,8 @@ int main(void) {
     printf("Key Down:  %f\n", keystrokes[i].keyDownTime);
     printf("Key Up:    %f\n\n", keystrokes[i].keyUpTime);
   }
+
+  takeDownDownLatencies(keystrokes);
 
   fflush(stdout);
   fprintf(stderr, "%s\n", strerror(errno));
