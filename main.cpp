@@ -18,7 +18,7 @@ struct keystroke {
 
 // ----------------- //
 
-// ---- FUNKCJE ---- //
+// --- FUNCTIONS --- //
 
 // Keystroke Data //
 
@@ -49,6 +49,7 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
 
 std::vector<int> takeKeyCodes(std::vector<keystroke> keystrokes) {
   std::vector<int> keyCodes;
+
   for (int i = 0; i < keystrokes.size(); i++)
     keyCodes.push_back(keystrokes[i].keyCode);
 
@@ -57,6 +58,7 @@ std::vector<int> takeKeyCodes(std::vector<keystroke> keystrokes) {
 
 std::vector<double> takeDownDownLatencies(std::vector<keystroke> keystrokes) {
   std::vector<double> downDownLatencies;
+
   for (int i = 1; i < keystrokes.size(); i++) {
     double downDownLatency =
         keystrokes[i].keyDownTime - keystrokes[i - 1].keyDownTime;
@@ -68,6 +70,7 @@ std::vector<double> takeDownDownLatencies(std::vector<keystroke> keystrokes) {
 
 std::vector<double> takeUpDownLatencies(std::vector<keystroke> keystrokes) {
   std::vector<double> upDownLatencies;
+
   for (int i = 1; i < keystrokes.size(); i++) {
     double upDownLatency =
         keystrokes[i].keyDownTime - keystrokes[i - 1].keyUpTime;
@@ -79,6 +82,7 @@ std::vector<double> takeUpDownLatencies(std::vector<keystroke> keystrokes) {
 
 std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
   std::vector<double> downUpLatencies;
+
   for (int i = 0; i < keystrokes.size(); i++) {
     double downUpLatency = keystrokes[i].keyUpTime - keystrokes[i].keyDownTime;
     downUpLatencies.push_back(downUpLatency);
@@ -103,59 +107,31 @@ void printEvent(input_event event) {
          (long)event.time.tv_sec, (long)event.time.tv_usec);
 }
 
-// *** GŁÓWNA FUNKCJA *** //
+std::vector<input_event> getSample(std::string devicePath) {
+  std::vector<input_event> events;
+  int fileDescriptor = open(devicePath.c_str(), O_RDONLY);
+  while (true) {
+    struct input_event event;
+    int num_bytes = read(fileDescriptor, &event, sizeof(struct input_event));
+    if (event.type == EV_KEY && (event.value == 0 || event.value == 1)) {
+      if (event.code == 28 && event.value == 1)
+        break;
+      printEvent(event);
+      events.push_back(event);
+    }
+  }
+
+  return events;
+}
+
+// *** MAIN FUNCTION *** //
 
 int main(void) {
-  const char *devicePath = "/dev/input/by-id/"
-                           "usb-Microsft_Microsoft_Wireless_Desktop_Receiver_3."
-                           "1-event-kbd";
-  // Otwórz plik
-  int fileDescriptor = open(devicePath, O_RDONLY);
+  const std::string devicePath = "/dev/input/by-id/"
+                                 "usb-Microsft_Microsoft_Wireless_Desktop_"
+                                 "Receiver_3.1-event-kbd";
 
-  // Sprawdź czy plik został otwarty poprawnie
-  if (fileDescriptor == -1) {
-    fprintf(stderr, "Cannot open %s: %s\n", devicePath, strerror(errno));
-    return EXIT_FAILURE;
-  }
+  std::vector<input_event> events = getSample(devicePath);
 
-  std::vector<input_event> events;
-  std::vector<keystroke> keystrokes;
-
-  int counter = 0;
-
-  while (counter < 11) {
-    struct input_event event;
-    ssize_t numberOfBytesRead = read(fileDescriptor, &event, sizeof event);
-
-    if (numberOfBytesRead == (ssize_t)-1) {
-      if (errno == EINTR)
-        continue;
-      else
-        break;
-    }
-
-    if (numberOfBytesRead != sizeof event) {
-      errno = EIO;
-      break;
-    }
-
-    if (event.type == EV_KEY && (event.value == 0 || event.value == 1)) {
-      events.push_back(event);
-      counter++;
-    }
-  }
-
-  keystrokes = takeKeystrokes(events);
-
-  for (int i = 0; i < keystrokes.size(); i++) {
-    printf("Key Code:  %i\n", keystrokes[i].keyCode);
-    printf("Key Down:  %f\n", keystrokes[i].keyDownTime);
-    printf("Key Up:    %f\n\n", keystrokes[i].keyUpTime);
-  }
-
-  takeDownUpLatencies(keystrokes);
-
-  fflush(stdout);
-  fprintf(stderr, "%s\n", strerror(errno));
-  return EXIT_FAILURE;
+  return 0;
 }
