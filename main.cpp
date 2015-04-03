@@ -97,12 +97,15 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 
 // Others //
 
+const int KEY_PRESSED = 1;
+const int KEY_RELEASED = 0;
+
 void printEvent(input_event event) {
   std::string keyState;
-  if (event.value == 0)
-    keyState = "RELEASED";
-  if (event.value == 1)
+  if (event.value == KEY_PRESSED)
     keyState = "PRESSED";
+  if (event.value == KEY_RELEASED)
+    keyState = "RELEASED";
   printf("%-8s | %3d | %ld.%06ld\n", keyState.c_str(), event.code,
          (long)event.time.tv_sec, (long)event.time.tv_usec);
 }
@@ -113,7 +116,8 @@ std::vector<input_event> getSample(std::string devicePath) {
   while (true) {
     struct input_event event;
     int num_bytes = read(fileDescriptor, &event, sizeof(struct input_event));
-    if (event.type == EV_KEY && (event.value == 0 || event.value == 1)) {
+    if (event.type == EV_KEY &&
+        (event.value == KEY_PRESSED || event.value == KEY_RELEASED)) {
       if (event.code == 28 && event.value == 1)
         break;
       printEvent(event);
@@ -127,10 +131,9 @@ std::vector<input_event> getSample(std::string devicePath) {
 // *** MAIN FUNCTION *** //
 
 int main(void) {
-  const std::string devicePath = "/dev/input/by-id/"
-                                 "usb-Microsft_Microsoft_Wireless_Desktop_"
-                                 "Receiver_3.1-event-kbd";
-
+  std::string devicePath = "/dev/input/by-id/"
+                           "usb-Microsft_Microsoft_Wireless_Desktop_Receiver_3."
+                           "1-event-kbd";
   std::vector<input_event> events = getSample(devicePath);
 
   return 0;
