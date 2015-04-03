@@ -118,9 +118,8 @@ std::vector<input_event> getSample(std::string devicePath) {
     int num_bytes = read(fileDescriptor, &event, sizeof(struct input_event));
     if (event.type == EV_KEY &&
         (event.value == KEY_PRESSED || event.value == KEY_RELEASED)) {
-      if (event.code == 28 && event.value == 1)
+      if (event.code == 28 && event.value == KEY_PRESSED)
         break;
-      printEvent(event);
       events.push_back(event);
     }
   }
