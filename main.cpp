@@ -133,7 +133,7 @@ std::vector<input_event> getSample(std::string devicePath) {
 
 // *** MAIN FUNCTION *** //
 
-int main(void) {
+int main() {
   std::string devicePath = "/dev/input/by-id/"
                            "usb-Microsft_Microsoft_Wireless_Desktop_Receiver_3."
                            "1-event-kbd";
