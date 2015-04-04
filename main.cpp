@@ -1,10 +1,7 @@
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
+#include <unistd.h> // read()
+#include <fcntl.h>  // open()
 #include <linux/input.h>
-#include <string.h>
-#include <stdio.h>
+#include <stdio.h> // printf()
 #include <vector>
 #include <string>
 
@@ -102,10 +99,16 @@ const int KEY_RELEASED = 0;
 
 void printEvent(input_event event) {
   std::string keyState;
-  if (event.value == KEY_PRESSED)
+
+  switch (event.value) {
+  case KEY_PRESSED:
     keyState = "PRESSED";
-  if (event.value == KEY_RELEASED)
+    break;
+  case KEY_RELEASED:
     keyState = "RELEASED";
+    break;
+  }
+
   printf("%-8s | %3d | %ld.%06ld\n", keyState.c_str(), event.code,
          (long)event.time.tv_sec, (long)event.time.tv_usec);
 }
