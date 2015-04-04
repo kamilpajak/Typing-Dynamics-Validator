@@ -1,7 +1,7 @@
-#include <unistd.h> // read()
-#include <fcntl.h>  // open()
 #include <linux/input.h>
-#include <stdio.h> // printf()
+#include <unistd.h>  // read()
+#include <fcntl.h>   // open()
+#include <ncurses.h>
 #include <vector>
 #include <string>
 
@@ -126,6 +126,7 @@ std::vector<input_event> getSample(std::string devicePath) {
       events.push_back(event);
     }
   }
+  close(fileDescriptor);
 
   return events;
 }
