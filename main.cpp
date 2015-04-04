@@ -1,6 +1,6 @@
 #include <linux/input.h>
-#include <unistd.h>  // read()
-#include <fcntl.h>   // open()
+#include <unistd.h> // read()
+#include <fcntl.h>  // open()
 #include <ncurses.h>
 #include <vector>
 #include <string>
