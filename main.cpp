@@ -22,9 +22,9 @@ struct keystroke {
 std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   std::vector<keystroke> keystrokes;
 
-  for (int i = 0; i < events.size() - 1; i++)
+  for (unsigned int i = 0; i < events.size() - 1; i++)
     if (events[i].value == 1)
-      for (int j = i + 1; j < events.size(); j++)
+      for (unsigned int j = i + 1; j < events.size(); j++)
         if (events[i].code == events[j].code) {
           double keyDownTime =
               events[i].time.tv_sec + (double)events[i].time.tv_usec / 1000000;
@@ -47,7 +47,7 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
 std::vector<int> takeKeyCodes(std::vector<keystroke> keystrokes) {
   std::vector<int> keyCodes;
 
-  for (int i = 0; i < keystrokes.size(); i++)
+  for (unsigned int i = 0; i < keystrokes.size(); i++)
     keyCodes.push_back(keystrokes[i].keyCode);
 
   return keyCodes;
@@ -56,7 +56,7 @@ std::vector<int> takeKeyCodes(std::vector<keystroke> keystrokes) {
 std::vector<double> takeDownDownLatencies(std::vector<keystroke> keystrokes) {
   std::vector<double> downDownLatencies;
 
-  for (int i = 1; i < keystrokes.size(); i++) {
+  for (unsigned int i = 1; i < keystrokes.size(); i++) {
     double downDownLatency =
         keystrokes[i].keyDownTime - keystrokes[i - 1].keyDownTime;
     downDownLatencies.push_back(downDownLatency);
@@ -68,7 +68,7 @@ std::vector<double> takeDownDownLatencies(std::vector<keystroke> keystrokes) {
 std::vector<double> takeUpDownLatencies(std::vector<keystroke> keystrokes) {
   std::vector<double> upDownLatencies;
 
-  for (int i = 1; i < keystrokes.size(); i++) {
+  for (unsigned int i = 1; i < keystrokes.size(); i++) {
     double upDownLatency =
         keystrokes[i].keyDownTime - keystrokes[i - 1].keyUpTime;
     upDownLatencies.push_back(upDownLatency);
@@ -80,7 +80,7 @@ std::vector<double> takeUpDownLatencies(std::vector<keystroke> keystrokes) {
 std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
   std::vector<double> downUpLatencies;
 
-  for (int i = 0; i < keystrokes.size(); i++) {
+  for (unsigned int i = 0; i < keystrokes.size(); i++) {
     double downUpLatency = keystrokes[i].keyUpTime - keystrokes[i].keyDownTime;
     downUpLatencies.push_back(downUpLatency);
   }
