@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-// --- KEYSTROKE --- //
+// --- STRUCTURES --- //
 
 struct keystroke {
   int keyCode;
@@ -13,15 +13,11 @@ struct keystroke {
   double keyUpTime;
 };
 
-// ----------------- //
-
 // --- FUNCTIONS --- //
 
-// Keystroke Data //
-
+// Keystroke Data
 std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   std::vector<keystroke> keystrokes;
-
   for (unsigned int i = 0; i < events.size() - 1; i++)
     if (events[i].value == 1)
       for (unsigned int j = i + 1; j < events.size(); j++)
@@ -30,7 +26,6 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
               events[i].time.tv_sec + (double)events[i].time.tv_usec / 1000000;
           double keyUpTime =
               events[j].time.tv_sec + (double)events[j].time.tv_usec / 1000000;
-
           keystroke caughtKeystroke;
           caughtKeystroke.keyCode = events[i].code;
           caughtKeystroke.keyDownTime = keyDownTime;
@@ -38,68 +33,56 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
           keystrokes.push_back(caughtKeystroke);
           break;
         }
-
   return keystrokes;
 }
 
-// Features //
-
+// Features
 std::vector<int> takeKeyCodes(std::vector<keystroke> keystrokes) {
   std::vector<int> keyCodes;
-
   for (unsigned int i = 0; i < keystrokes.size(); i++)
     keyCodes.push_back(keystrokes[i].keyCode);
-
   return keyCodes;
 }
 
 std::vector<double> takeDownDownLatencies(std::vector<keystroke> keystrokes) {
   std::vector<double> downDownLatencies;
-
   for (unsigned int i = 1; i < keystrokes.size(); i++) {
     double downDownLatency =
         keystrokes[i].keyDownTime - keystrokes[i - 1].keyDownTime;
     downDownLatencies.push_back(downDownLatency);
   }
-
   return downDownLatencies;
 }
 
 std::vector<double> takeUpDownLatencies(std::vector<keystroke> keystrokes) {
   std::vector<double> upDownLatencies;
-
   for (unsigned int i = 1; i < keystrokes.size(); i++) {
     double upDownLatency =
         keystrokes[i].keyDownTime - keystrokes[i - 1].keyUpTime;
     upDownLatencies.push_back(upDownLatency);
   }
-
   return upDownLatencies;
 }
 
 std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
   std::vector<double> downUpLatencies;
-
   for (unsigned int i = 0; i < keystrokes.size(); i++) {
     double downUpLatency = keystrokes[i].keyUpTime - keystrokes[i].keyDownTime;
     downUpLatencies.push_back(downUpLatency);
   }
-
   return downUpLatencies;
 }
 
-// Template //
+// Template
 
-// Classifier //
+// Classifier
 
-// Others //
-
+// Others
 const int KEY_PRESSED = 1;
 const int KEY_RELEASED = 0;
 
 void printEvent(input_event event) {
   std::string keyState;
-
   switch (event.value) {
   case KEY_PRESSED:
     keyState = "PRESSED";
@@ -108,7 +91,6 @@ void printEvent(input_event event) {
     keyState = "RELEASED";
     break;
   }
-
   printf("%-8s | %3d | %ld.%06ld\n", keyState.c_str(), event.code,
          (long)event.time.tv_sec, (long)event.time.tv_usec);
 }
@@ -127,7 +109,6 @@ std::vector<input_event> getSample(std::string devicePath) {
     }
   }
   close(fileDescriptor);
-
   return events;
 }
 
@@ -138,6 +119,5 @@ int main() {
                            "usb-Microsft_Microsoft_Wireless_Desktop_Receiver_3."
                            "1-event-kbd";
   std::vector<input_event> events = getSample(devicePath);
-
   return 0;
 }
