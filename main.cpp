@@ -78,8 +78,11 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 // Classifier
 
 // Others
-const int KEY_PRESSED = 1;
 const int KEY_RELEASED = 0;
+const int KEY_PRESSED = 1;
+const int KEY_REPEATED = 2;
+
+const int ENTER_CODE = 28;
 
 void printEvent(input_event event) {
   std::string keyState;
@@ -101,15 +104,15 @@ std::vector<input_event> getSample(std::string devicePath) {
   struct input_event event;
   while (true) {
     read(fileDescriptor, &event, sizeof(struct input_event));
-    if (event.type == EV_KEY)
-      if (event.value == KEY_PRESSED || event.value == KEY_RELEASED) {
-        if (event.code == 28 && event.value == KEY_RELEASED) {
-          close(fileDescriptor);
-          fileDescriptor = open(devicePath.c_str(), O_TRUNC);
-          break;
-        }
+    if (event.type == EV_KEY) {
+      if (event.code != ENTER_CODE)
         events.push_back(event);
+      else if (event.value == KEY_PRESSED) {
+        close(fileDescriptor);
+        fileDescriptor = open(devicePath.c_str(), O_TRUNC);
+        break;
       }
+    }
   }
   close(fileDescriptor);
   return events;
