@@ -98,13 +98,16 @@ void printEvent(input_event event) {
 std::vector<input_event> getSample(std::string devicePath) {
   std::vector<input_event> events;
   int fileDescriptor = open(devicePath.c_str(), O_RDONLY);
+  struct input_event event;
   while (true) {
-    struct input_event event;
     read(fileDescriptor, &event, sizeof(struct input_event));
     if (event.type == EV_KEY)
       if (event.value == KEY_PRESSED || event.value == KEY_RELEASED) {
-        if (event.code == 28 && event.value == KEY_PRESSED)
+        if (event.code == 28 && event.value == KEY_RELEASED) {
+          close(fileDescriptor);
+          fileDescriptor = open(devicePath.c_str(), O_TRUNC);
           break;
+        }
         events.push_back(event);
       }
   }
@@ -119,5 +122,11 @@ int main() {
                            "usb-Microsft_Microsoft_Wireless_Desktop_Receiver_3."
                            "1-event-kbd";
   std::vector<input_event> sample = getSample(devicePath);
+  initscr();
+  printw("Hello World!");
+  refresh();
+  getch();
+  endwin();
+
   return 0;
 }
