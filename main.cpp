@@ -5,6 +5,11 @@
 #include <vector>
 #include <string>
 
+// --- CONSTANTS --- //
+
+enum {KEY_RELEASED, KEY_PRESSED, KEY_REPEATED};
+const int ENTER_CODE = 28;
+
 // --- STRUCTURES --- //
 
 struct keystroke {
@@ -78,26 +83,6 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 // Classifier
 
 // Others
-const int KEY_RELEASED = 0;
-const int KEY_PRESSED = 1;
-const int KEY_REPEATED = 2;
-
-const int ENTER_CODE = 28;
-
-void printEvent(input_event event) {
-  std::string keyState;
-  switch (event.value) {
-  case KEY_PRESSED:
-    keyState = "PRESSED";
-    break;
-  case KEY_RELEASED:
-    keyState = "RELEASED";
-    break;
-  }
-  printf("%-8s | %3d | %ld.%06ld\n", keyState.c_str(), event.code,
-         (long)event.time.tv_sec, (long)event.time.tv_usec);
-}
-
 std::vector<input_event> getSample(std::string devicePath) {
   std::vector<input_event> events;
   int fileDescriptor = open(devicePath.c_str(), O_RDONLY);
@@ -107,7 +92,7 @@ std::vector<input_event> getSample(std::string devicePath) {
     if (event.type == EV_KEY) {
       if (event.code != ENTER_CODE)
         events.push_back(event);
-      else if (event.value == KEY_PRESSED) {
+      else if (event.value == KEY_RELEASED) {
         close(fileDescriptor);
         fileDescriptor = open(devicePath.c_str(), O_TRUNC);
         break;
