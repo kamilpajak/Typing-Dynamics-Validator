@@ -7,7 +7,7 @@
 
 // --- CONSTANTS --- //
 
-enum {KEY_RELEASED, KEY_PRESSED, KEY_REPEATED};
+enum { KEY_RELEASED, KEY_PRESSED, KEY_REPEATED };
 const int ENTER_CODE = 28;
 
 // --- STRUCTURES --- //
