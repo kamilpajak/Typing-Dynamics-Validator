@@ -85,7 +85,9 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 // Others
 void clearInputBuffer() {
   int character;
-  while ((character = getchar()) != '\n' && character != EOF);
+  do {
+    character = getchar();
+  } while (character != '\n' && character != EOF);
 }
 
 std::vector<input_event> getSample(std::string devicePath) {
