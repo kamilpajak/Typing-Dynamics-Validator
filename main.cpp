@@ -83,6 +83,11 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 // Classifier
 
 // Others
+void clearInputBuffer() {
+  int character;
+  while ((character = getchar()) != '\n' && character != EOF);
+}
+
 std::vector<input_event> getSample(std::string devicePath) {
   std::vector<input_event> events;
   int fileDescriptor = open(devicePath.c_str(), O_RDONLY);
@@ -92,9 +97,7 @@ std::vector<input_event> getSample(std::string devicePath) {
     if (event.type == EV_KEY) {
       if (event.code != ENTER_CODE)
         events.push_back(event);
-      else if (event.value == KEY_RELEASED) {
-        close(fileDescriptor);
-        fileDescriptor = open(devicePath.c_str(), O_TRUNC);
+      else if (event.value == KEY_PRESSED) {
         break;
       }
     }
@@ -113,6 +116,9 @@ int main() {
   initscr();
   printw("Hello World!");
   refresh();
+
+  clearInputBuffer();
+
   getch();
   endwin();
 
