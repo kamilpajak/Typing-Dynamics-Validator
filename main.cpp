@@ -94,14 +94,13 @@ std::vector<input_event> getSample(std::string devicePath) {
   std::vector<input_event> events;
   int fileDescriptor = open(devicePath.c_str(), O_RDONLY);
   struct input_event event;
-
   do {
     read(fileDescriptor, &event, sizeof(struct input_event));
     if (event.type == EV_KEY && event.code != ENTER_CODE)
       events.push_back(event);
   } while (event.code == ENTER_CODE && event.value == KEY_PRESSED);
-  clearInputBuffer();
   close(fileDescriptor);
+  clearInputBuffer();
   return events;
 }
 
