@@ -100,9 +100,11 @@ bool isEnterPressed(input_event event) {
 
 void clearInputBuffer() {
   int character;
-  do {
-    character = getchar();
-  } while (character != '\n' && character != EOF);
+  while (true) {
+    character = getch();
+    if (character == '\n' || character == EOF)
+      break;
+  }
 }
 
 std::vector<input_event> getSample(std::string devicePath) {
@@ -127,8 +129,8 @@ int main() {
   std::string devicePath = "/dev/input/by-id/"
                            "usb-Microsft_Microsoft_Wireless_Desktop_Receiver_3."
                            "1-event-kbd";
-  std::vector<input_event> sample = getSample(devicePath);
   initscr();
+  std::vector<input_event> sample = getSample(devicePath);
   printw("%i", sample.size());
   refresh();
   getch();
