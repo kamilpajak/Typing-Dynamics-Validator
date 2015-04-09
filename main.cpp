@@ -8,7 +8,6 @@
 // --- CONSTANTS --- //
 
 enum { KEY_RELEASED, KEY_PRESSED, KEY_REPEATED };
-const int ENTER_CODE = 28;
 
 // --- STRUCTURES --- //
 
@@ -83,6 +82,22 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 // Classifier
 
 // Others
+bool isEventValid(input_event event) {
+  if (event.type == EV_KEY)
+    if (event.code != 28 && event.code != 96)
+      if (event.value != KEY_REPEATED)
+        return true;
+  return false;
+}
+
+bool isEnterPressed(input_event event) {
+  if (event.type == EV_KEY)
+    if (event.code == 28 || event.code == 96)
+      if (event.value == KEY_PRESSED)
+        return true;
+  return false;
+}
+
 void clearInputBuffer() {
   int character;
   do {
@@ -94,11 +109,13 @@ std::vector<input_event> getSample(std::string devicePath) {
   std::vector<input_event> events;
   int fileDescriptor = open(devicePath.c_str(), O_RDONLY);
   struct input_event event;
-  do {
+  while (true) {
     read(fileDescriptor, &event, sizeof(struct input_event));
-    if (event.type == EV_KEY && event.code != ENTER_CODE)
+    if (isEventValid(event))
       events.push_back(event);
-  } while (event.code == ENTER_CODE && event.value == KEY_PRESSED);
+    else if (isEnterPressed(event))
+      break;
+  }
   close(fileDescriptor);
   clearInputBuffer();
   return events;
@@ -112,7 +129,7 @@ int main() {
                            "1-event-kbd";
   std::vector<input_event> sample = getSample(devicePath);
   initscr();
-  printw("Hello World!");
+  printw("%i", sample.size());
   refresh();
   getch();
   endwin();
