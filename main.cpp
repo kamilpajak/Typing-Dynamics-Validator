@@ -19,6 +19,50 @@ struct keystroke {
 
 // --- FUNCTIONS --- //
 
+// Sample
+bool isEventValid(input_event event) {
+  if (event.type == EV_KEY)
+    if (event.code != 28 && event.code != 96)
+      if (event.value != KEY_REPEATED)
+        return true;
+  return false;
+}
+
+bool isEnterPressed(input_event event) {
+  if (event.type == EV_KEY)
+    if (event.code == 28 || event.code == 96)
+      if (event.value == KEY_PRESSED)
+        return true;
+  return false;
+}
+
+void clearInputBuffer() {
+  int character;
+  while (true) {
+    character = getch();
+    if (character == '\n' || character == EOF)
+      break;
+  }
+}
+
+std::vector<input_event> getSample(std::string devicePath) {
+  std::vector<input_event> events;
+  int fileDescriptor = open(devicePath.c_str(), O_RDONLY);
+  struct input_event event;
+  while (true) {
+    read(fileDescriptor, &event, sizeof(struct input_event));
+    if (isEventValid(event)) {
+      events.push_back(event);
+      continue;
+    }
+    if (isEnterPressed(event))
+      break;
+  }
+  close(fileDescriptor);
+  clearInputBuffer();
+  return events;
+}
+
 // Keystroke Data
 std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   std::vector<keystroke> keystrokes;
@@ -80,48 +124,6 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 // Template
 
 // Classifier
-
-// Others
-bool isEventValid(input_event event) {
-  if (event.type == EV_KEY)
-    if (event.code != 28 && event.code != 96)
-      if (event.value != KEY_REPEATED)
-        return true;
-  return false;
-}
-
-bool isEnterPressed(input_event event) {
-  if (event.type == EV_KEY)
-    if (event.code == 28 || event.code == 96)
-      if (event.value == KEY_PRESSED)
-        return true;
-  return false;
-}
-
-void clearInputBuffer() {
-  int character;
-  while (true) {
-    character = getch();
-    if (character == '\n' || character == EOF)
-      break;
-  }
-}
-
-std::vector<input_event> getSample(std::string devicePath) {
-  std::vector<input_event> events;
-  int fileDescriptor = open(devicePath.c_str(), O_RDONLY);
-  struct input_event event;
-  while (true) {
-    read(fileDescriptor, &event, sizeof(struct input_event));
-    if (isEventValid(event))
-      events.push_back(event);
-    else if (isEnterPressed(event))
-      break;
-  }
-  close(fileDescriptor);
-  clearInputBuffer();
-  return events;
-}
 
 // *** MAIN FUNCTION *** //
 
