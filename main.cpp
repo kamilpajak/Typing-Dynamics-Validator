@@ -2,6 +2,7 @@
 #include <unistd.h> // read()
 #include <fcntl.h>  // open()
 #include <ncurses.h>
+#include <menu.h>
 #include <vector>
 #include <string>
 
@@ -125,6 +126,8 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 
 // Classifier
 
+// User interface
+
 // *** MAIN FUNCTION *** //
 
 int main() {
@@ -132,10 +135,7 @@ int main() {
                            "usb-Microsft_Microsoft_Wireless_Desktop_Receiver_3."
                            "1-event-kbd";
   initscr();
-  std::vector<input_event> sample = getSample(devicePath);
-  printw("%i", sample.size());
-  refresh();
-  getch();
+
   endwin();
   return 0;
 }
