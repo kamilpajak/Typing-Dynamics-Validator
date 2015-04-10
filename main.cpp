@@ -156,14 +156,8 @@ void print_in_middle(WINDOW *win, int starty, int startx, int width,
 }
 
 void showMenu() {
-  char *choices[] = {"Choice 1", "Choice 2", "Choice 3",
-                     "Choice 4", "Exit",     (char *)NULL};
-
-  ITEM **my_items;
-  int c;
-  MENU *my_menu;
-  WINDOW *my_menu_win;
-  int n_choices, i;
+  char *choices[] = {"CREATE A NEW PROFILE", "VERIFY THE AUTHENTICITY", "EXIT",
+                     (char *)NULL};
 
   /* Initialize curses */
   initscr();
@@ -175,16 +169,19 @@ void showMenu() {
   curs_set(0);
 
   /* Create items */
-  n_choices = sizeof(choices) / sizeof(choices[0]);
-  my_items = (ITEM **)calloc(n_choices, sizeof(ITEM *));
-  for (i = 0; i < n_choices; ++i)
+  int n_choices = sizeof(choices) / sizeof(*choices);
+  ITEM **my_items = (ITEM **)calloc(n_choices, sizeof(ITEM *));
+  for (int i = 0; i < n_choices; i++)
     my_items[i] = new_item(choices[i], choices[i]);
 
   /* Crate menu */
-  my_menu = new_menu((ITEM **)my_items);
+  MENU *my_menu = new_menu((ITEM **)my_items);
 
   /* Create the window to be associated with the menu */
-  my_menu_win = newwin(10, 40, 4, 4);
+  int terminal_height, terminal_width;
+  getmaxyx(stdscr, terminal_height, terminal_width);
+  WINDOW *my_menu_win =
+      newwin(10, 40, terminal_height / 2 - 5, terminal_width / 2 - 20);
   keypad(my_menu_win, TRUE);
 
   /* Set main window and sub window */
@@ -196,7 +193,8 @@ void showMenu() {
 
   /* Print a border around the main window and print a title */
   box(my_menu_win, 0, 0);
-  print_in_middle(my_menu_win, 1, 0, 40, "Typing Dynamics Validator", COLOR_PAIR(1));
+  print_in_middle(my_menu_win, 1, 0, 40, "Typing Dynamics Validator",
+                  COLOR_PAIR(1));
   mvwaddch(my_menu_win, 2, 0, ACS_LTEE);
   mvwhline(my_menu_win, 2, 1, ACS_HLINE, 38);
   mvwaddch(my_menu_win, 2, 39, ACS_RTEE);
@@ -205,7 +203,7 @@ void showMenu() {
   /* Post the menu */
   post_menu(my_menu);
   wrefresh(my_menu_win);
-
+  int c;
   while ((c = wgetch(my_menu_win)) != KEY_F(1)) {
     switch (c) {
     case KEY_DOWN:
@@ -221,7 +219,7 @@ void showMenu() {
   /* Unpost and free all the memory taken up */
   unpost_menu(my_menu);
   free_menu(my_menu);
-  for (i = 0; i < n_choices; ++i)
+  for (int i = 0; i < n_choices; i++)
     free_item(my_items[i]);
   endwin();
 }
@@ -232,8 +230,6 @@ int main() {
   std::string devicePath = "/dev/input/by-id/"
                            "usb-Microsft_Microsoft_Wireless_Desktop_Receiver_3."
                            "1-event-kbd";
-
   showMenu();
-
   return 0;
 }
