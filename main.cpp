@@ -155,8 +155,10 @@ void print_in_middle(WINDOW *win, int starty, int startx, int width,
   refresh();
 }
 
-void showMenu() {
-  char *choices[] = {"CREATE A NEW PROFILE", "VERIFY THE AUTHENTICITY", "EXIT",
+void showMainView() {
+  char *choices[] = {"CREATE A NEW PROFILE",
+                     "VERIFY THE AUTHENTICITY",
+                     "EXIT",
                      (char *)NULL};
 
   /* Initialize curses */
@@ -177,23 +179,31 @@ void showMenu() {
   /* Crate menu */
   MENU *my_menu = new_menu((ITEM **)my_items);
 
+  /* Set menu option not to show the description */
+  menu_opts_off(my_menu, O_SHOWDESC);
+
   /* Create the window to be associated with the menu */
   int terminal_height, terminal_width;
   getmaxyx(stdscr, terminal_height, terminal_width);
-  WINDOW *my_menu_win =
-      newwin(10, 40, terminal_height / 2 - 5, terminal_width / 2 - 20);
+  const int window_height = 20;
+  const int window_width = 70;
+
+  WINDOW *my_menu_win = newwin(window_height, window_width,
+                               terminal_height / 2 - window_height / 2,
+                               terminal_width / 2 - window_width / 2);
   keypad(my_menu_win, TRUE);
 
   /* Set main window and sub window */
   set_menu_win(my_menu, my_menu_win);
-  set_menu_sub(my_menu, derwin(my_menu_win, 6, 38, 3, 1));
+  set_menu_sub(my_menu, derwin(my_menu_win, 16, 68, 3, 1));
 
-  /* Set menu mark to the string " * " */
+  /* Set menu mark to the string */
   set_menu_mark(my_menu, " * ");
 
   /* Print a border around the main window and print a title */
   box(my_menu_win, 0, 0);
-  print_in_middle(my_menu_win, 1, 0, 40, "Typing Dynamics Validator",
+  print_in_middle(my_menu_win, 0, 0, window_width,
+                  " Typing Dynamics Validator ",
                   COLOR_PAIR(1));
   mvwaddch(my_menu_win, 2, 0, ACS_LTEE);
   mvwhline(my_menu_win, 2, 1, ACS_HLINE, 38);
@@ -230,6 +240,6 @@ int main() {
   std::string devicePath = "/dev/input/by-id/"
                            "usb-Microsft_Microsoft_Wireless_Desktop_Receiver_3."
                            "1-event-kbd";
-  showMenu();
+  showMainView();
   return 0;
 }
