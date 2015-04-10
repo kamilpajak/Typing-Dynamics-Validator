@@ -66,7 +66,7 @@ std::vector<input_event> getSample(std::string devicePath) {
   return events;
 }
 
-// Keystroke Data
+// Keystroke data
 std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   std::vector<keystroke> keystrokes;
   for (unsigned int i = 0; i < events.size() - 1; i++)
@@ -130,31 +130,7 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 
 // --- USER INTERFACE --- //
 
-// Menu
-void print_in_middle(WINDOW *win, int starty, int startx, int width,
-                     char *string, chtype color) {
-  int length, x, y;
-  float temp;
-
-  if (win == NULL)
-    win = stdscr;
-  getyx(win, y, x);
-  if (startx != 0)
-    x = startx;
-  if (starty != 0)
-    y = starty;
-  if (width == 0)
-    width = 80;
-
-  length = strlen(string);
-  temp = (width - length) / 2;
-  x = startx + (int)temp;
-  wattron(win, color);
-  mvwprintw(win, y, x, "%s", string);
-  wattroff(win, color);
-  refresh();
-}
-
+// Main view
 void showMainView() {
   char *choices[] = {" < CREATE > ",
                      " < VERIFY > ",
@@ -199,22 +175,27 @@ void showMainView() {
   set_menu_win(my_menu, my_win);
   int menu_height = 1;
   int menu_width = 38;
-  set_menu_sub(my_menu, derwin(my_win, menu_height, menu_width, window_height - 1, (window_width - menu_width) / 2));
+  set_menu_sub(my_menu, derwin(my_win, menu_height, menu_width,
+                               window_height - 1,
+                               (window_width - menu_width) / 2));
 
   /* Set menu mark to the string */
   set_menu_mark(my_menu, NULL);
 
   /* Print a border around the main window and print a title */
   box(my_win, 0, 0);
-  print_in_middle(my_win, 0, 0, window_width,
-                  " Typing Dynamics Validator ", COLOR_PAIR(1));
+  std::string title = " Typing Dynamics Validator ";
+  int title_length = strlen(title.c_str());
+  wattron(my_win, COLOR_PAIR(1));
+  mvwprintw(my_win, 0, (window_width - title_length) / 2, "%s", title.c_str());
+  wattroff(my_win, COLOR_PAIR(1));
   refresh();
 
   /* Post the menu */
   post_menu(my_menu);
   wrefresh(my_win);
   int c;
-  while ((c = wgetch(my_win)) != KEY_F(1)) {
+  while ((c = wgetch(my_win))) {
     switch (c) {
     case KEY_RIGHT:
       menu_driver(my_menu, REQ_RIGHT_ITEM);
