@@ -156,9 +156,9 @@ void print_in_middle(WINDOW *win, int starty, int startx, int width,
 }
 
 void showMainView() {
-  char *choices[] = {"CREATE A NEW PROFILE",
-                     "VERIFY THE AUTHENTICITY",
-                     "EXIT",
+  char *choices[] = {" < CREATE > ",
+                     " < VERIFY > ",
+                     " <  EXIT  > ",
                      (char *)NULL};
 
   /* Initialize curses */
@@ -170,7 +170,19 @@ void showMainView() {
   init_pair(1, COLOR_RED, COLOR_BLACK);
   curs_set(0);
 
-  /* Create items */
+  /* Create the window */
+  int terminal_height, terminal_width;
+  getmaxyx(stdscr, terminal_height, terminal_width);
+  const int window_height = 10;
+  const int window_width = 70;
+
+  WINDOW *my_win = newwin(window_height,
+                          window_width,
+                          (terminal_height - window_height) / 2,
+                          (terminal_width - window_width) / 2);
+  keypad(my_win, TRUE);
+
+  /* Create menu items */
   int n_choices = sizeof(choices) / sizeof(*choices);
   ITEM **my_items = (ITEM **)calloc(n_choices, sizeof(ITEM *));
   for (int i = 0; i < n_choices; i++)
@@ -179,51 +191,39 @@ void showMainView() {
   /* Crate menu */
   MENU *my_menu = new_menu((ITEM **)my_items);
 
-  /* Set menu option not to show the description */
+  /* Set menu options */
   menu_opts_off(my_menu, O_SHOWDESC);
-
-  /* Create the window to be associated with the menu */
-  int terminal_height, terminal_width;
-  getmaxyx(stdscr, terminal_height, terminal_width);
-  const int window_height = 20;
-  const int window_width = 70;
-
-  WINDOW *my_menu_win = newwin(window_height, window_width,
-                               terminal_height / 2 - window_height / 2,
-                               terminal_width / 2 - window_width / 2);
-  keypad(my_menu_win, TRUE);
+  set_menu_format(my_menu, 1, 3);
 
   /* Set main window and sub window */
-  set_menu_win(my_menu, my_menu_win);
-  set_menu_sub(my_menu, derwin(my_menu_win, 16, 68, 3, 1));
+  set_menu_win(my_menu, my_win);
+  int menu_height = 1;
+  int menu_width = 38;
+  set_menu_sub(my_menu, derwin(my_win, menu_height, menu_width, window_height - 1, (window_width - menu_width) / 2));
 
   /* Set menu mark to the string */
-  set_menu_mark(my_menu, " * ");
+  set_menu_mark(my_menu, NULL);
 
   /* Print a border around the main window and print a title */
-  box(my_menu_win, 0, 0);
-  print_in_middle(my_menu_win, 0, 0, window_width,
-                  " Typing Dynamics Validator ",
-                  COLOR_PAIR(1));
-  mvwaddch(my_menu_win, 2, 0, ACS_LTEE);
-  mvwhline(my_menu_win, 2, 1, ACS_HLINE, 38);
-  mvwaddch(my_menu_win, 2, 39, ACS_RTEE);
+  box(my_win, 0, 0);
+  print_in_middle(my_win, 0, 0, window_width,
+                  " Typing Dynamics Validator ", COLOR_PAIR(1));
   refresh();
 
   /* Post the menu */
   post_menu(my_menu);
-  wrefresh(my_menu_win);
+  wrefresh(my_win);
   int c;
-  while ((c = wgetch(my_menu_win)) != KEY_F(1)) {
+  while ((c = wgetch(my_win)) != KEY_F(1)) {
     switch (c) {
-    case KEY_DOWN:
-      menu_driver(my_menu, REQ_DOWN_ITEM);
+    case KEY_RIGHT:
+      menu_driver(my_menu, REQ_RIGHT_ITEM);
       break;
-    case KEY_UP:
-      menu_driver(my_menu, REQ_UP_ITEM);
+    case KEY_LEFT:
+      menu_driver(my_menu, REQ_LEFT_ITEM);
       break;
     }
-    wrefresh(my_menu_win);
+    wrefresh(my_win);
   }
 
   /* Unpost and free all the memory taken up */
