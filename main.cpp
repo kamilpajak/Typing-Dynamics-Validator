@@ -132,9 +132,7 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 
 // Main view
 void showMainView() {
-  char *choices[] = {" < CREATE > ",
-                     " < VERIFY > ",
-                     " <  EXIT  > ",
+  char *choices[] = {" < CREATE > ", " < VERIFY > ", " <  EXIT  > ",
                      (char *)NULL};
 
   /* Initialize curses */
@@ -152,10 +150,9 @@ void showMainView() {
   const int window_height = 10;
   const int window_width = 70;
 
-  WINDOW *my_win = newwin(window_height,
-                          window_width,
-                          (terminal_height - window_height) / 2,
-                          (terminal_width - window_width) / 2);
+  WINDOW *my_win =
+      newwin(window_height, window_width, (terminal_height - window_height) / 2,
+             (terminal_width - window_width) / 2);
   keypad(my_win, TRUE);
 
   /* Create menu items */
@@ -175,9 +172,9 @@ void showMainView() {
   set_menu_win(my_menu, my_win);
   int menu_height = 1;
   int menu_width = 38;
-  set_menu_sub(my_menu, derwin(my_win, menu_height, menu_width,
-                               window_height - 1,
-                               (window_width - menu_width) / 2));
+  set_menu_sub(my_menu,
+               derwin(my_win, menu_height, menu_width, window_height - 1,
+                      (window_width - menu_width) / 2));
 
   /* Set menu mark to the string */
   set_menu_mark(my_menu, NULL);
@@ -202,6 +199,8 @@ void showMainView() {
       break;
     case KEY_LEFT:
       menu_driver(my_menu, REQ_LEFT_ITEM);
+      break;
+    case 10: /* Enter */
       break;
     }
     wrefresh(my_win);
