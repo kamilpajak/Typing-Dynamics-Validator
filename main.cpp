@@ -137,6 +137,7 @@ void showMainView() {
   start_color();
   cbreak();
   noecho();
+  curs_set(0);
   keypad(stdscr, TRUE);
   init_pair(1, COLOR_RED, COLOR_BLACK);
 
@@ -150,27 +151,28 @@ void showMainView() {
   for (unsigned int i = 0; i < menuChoices.size(); i++)
     menuItems[i] = new_item(menuChoices[i].c_str(), menuChoices[i].c_str());
   menuItems[menuChoices.size()] = (ITEM *)NULL;
-
   MENU *menu = new_menu((ITEM **)menuItems);
+
   set_menu_mark(menu, NULL);
   set_menu_format(menu, 1, menuChoices.size());
+  menu_opts_off(menu, O_SHOWDESC);
 
   // @ Setup window
   const int windowHeight = 6;
   const int windowWidth = 70;
-  WINDOW *window = newwin(windowHeight, windowWidth, 4, 4);
+  WINDOW *window = newwin(windowHeight, windowWidth, (LINES - windowHeight) / 2, (COLS - windowWidth) / 2);
   keypad(window, TRUE);
-  set_menu_win(menu, window);
-  set_menu_sub(menu, derwin(window, 6, 38, 3, 1));
   box(window, 0, 0);
+  set_menu_win(menu, window);
+  set_menu_sub(menu, derwin(window, 1, 38, windowHeight - 1, (windowWidth - 38) / 2));
 
   // @ Post the menu
   post_menu(menu);
   wrefresh(window);
 
-  int key;
-  while ((key = wgetch(window))) {
-    switch (key) {
+  int keyPressed;
+  while ((keyPressed = wgetch(window))) {
+    switch (keyPressed) {
     case KEY_RIGHT:
       menu_driver(menu, REQ_RIGHT_ITEM);
       break;
