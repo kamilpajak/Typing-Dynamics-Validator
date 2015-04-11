@@ -129,91 +129,43 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 // Classifier
 
 // --- USER INTERFACE --- //
+// clang-format off
 
 // Main view
 void showMainView() {
-  char *choices[] = {" < CREATE > ", " < VERIFY > ", " <  EXIT  > ",
-                     (char *)NULL};
+  const int windowHeight = 6;
+  const int windowWidth = 70;
 
-  /* Initialize curses */
+  // @ Initialize curses
   initscr();
   start_color();
   cbreak();
   noecho();
   keypad(stdscr, TRUE);
   init_pair(1, COLOR_RED, COLOR_BLACK);
-  curs_set(0);
 
-  /* Create the window */
-  int terminal_height, terminal_width;
-  getmaxyx(stdscr, terminal_height, terminal_width);
-  const int window_height = 10;
-  const int window_width = 70;
+  // @ Setup menu
+  std::vector<std::string> menuChoices;
+  menuChoices.push_back(" < CREATE > ");
+  menuChoices.push_back(" < VERIFY > ");
+  menuChoices.push_back(" <  EXIT  > ");
 
-  WINDOW *my_win =
-      newwin(window_height, window_width, (terminal_height - window_height) / 2,
-             (terminal_width - window_width) / 2);
-  keypad(my_win, TRUE);
+  ITEM **menuItems = (ITEM **)calloc(menuChoices.size() + 1, sizeof(ITEM *));
+  for (unsigned int i = 0; i < menuChoices.size(); i++)
+    menuItems[i] = new_item(menuChoices[i].c_str(), menuChoices[i].c_str());
+  menuItems[menuChoices.size()] = (ITEM *)NULL;
+  MENU *menu = new_menu((ITEM **)menuItems);
+  set_menu_mark(menu, NULL);
 
-  /* Create menu items */
-  int n_choices = sizeof(choices) / sizeof(*choices);
-  ITEM **my_items = (ITEM **)calloc(n_choices, sizeof(ITEM *));
-  for (int i = 0; i < n_choices; i++)
-    my_items[i] = new_item(choices[i], choices[i]);
-
-  /* Crate menu */
-  MENU *my_menu = new_menu((ITEM **)my_items);
-
-  /* Set menu options */
-  menu_opts_off(my_menu, O_SHOWDESC);
-  set_menu_format(my_menu, 1, 3);
-
-  /* Set main window and sub window */
-  set_menu_win(my_menu, my_win);
-  int menu_height = 1;
-  int menu_width = 38;
-  set_menu_sub(my_menu,
-               derwin(my_win, menu_height, menu_width, window_height - 1,
-                      (window_width - menu_width) / 2));
-
-  /* Set menu mark to the string */
-  set_menu_mark(my_menu, NULL);
-
-  /* Print a border around the main window and print a title */
-  box(my_win, 0, 0);
-  std::string title = " Typing Dynamics Validator ";
-  int title_length = strlen(title.c_str());
-  wattron(my_win, COLOR_PAIR(1));
-  mvwprintw(my_win, 0, (window_width - title_length) / 2, "%s", title.c_str());
-  wattroff(my_win, COLOR_PAIR(1));
-  refresh();
-
-  /* Post the menu */
-  post_menu(my_menu);
-  wrefresh(my_win);
-  int c;
-  while ((c = wgetch(my_win))) {
-    switch (c) {
-    case KEY_RIGHT:
-      menu_driver(my_menu, REQ_RIGHT_ITEM);
-      break;
-    case KEY_LEFT:
-      menu_driver(my_menu, REQ_LEFT_ITEM);
-      break;
-    case 10: /* Enter */
-      break;
-    }
-    wrefresh(my_win);
-  }
-
-  /* Unpost and free all the memory taken up */
-  unpost_menu(my_menu);
-  free_menu(my_menu);
-  for (int i = 0; i < n_choices; i++)
-    free_item(my_items[i]);
-  endwin();
+  // @ Setup window
+  WINDOW *window = newwin(windowHeight, windowWidth, 4, 4);
+  keypad(window, TRUE);
+  set_menu_win(menu, window);
+  set_menu_sub(menu, derwin(window, 6, 38, 3, 1));
+  box(window, 0, 0);
 }
 
+// clang-format on
 // *** MAIN FUNCTION *** //
 
 int main() {
