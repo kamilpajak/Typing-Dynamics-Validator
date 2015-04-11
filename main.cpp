@@ -129,13 +129,9 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 // Classifier
 
 // --- USER INTERFACE --- //
-// clang-format off
 
 // Main view
 void showMainView() {
-  const int windowHeight = 6;
-  const int windowWidth = 70;
-
   // @ Initialize curses
   initscr();
   start_color();
@@ -154,18 +150,45 @@ void showMainView() {
   for (unsigned int i = 0; i < menuChoices.size(); i++)
     menuItems[i] = new_item(menuChoices[i].c_str(), menuChoices[i].c_str());
   menuItems[menuChoices.size()] = (ITEM *)NULL;
+
   MENU *menu = new_menu((ITEM **)menuItems);
   set_menu_mark(menu, NULL);
+  set_menu_format(menu, 1, menuChoices.size());
 
   // @ Setup window
+  const int windowHeight = 6;
+  const int windowWidth = 70;
   WINDOW *window = newwin(windowHeight, windowWidth, 4, 4);
   keypad(window, TRUE);
   set_menu_win(menu, window);
   set_menu_sub(menu, derwin(window, 6, 38, 3, 1));
   box(window, 0, 0);
+
+  // @ Post the menu
+  post_menu(menu);
+  wrefresh(window);
+
+  int key;
+  while ((key = wgetch(window))) {
+    switch (key) {
+    case KEY_RIGHT:
+      menu_driver(menu, REQ_RIGHT_ITEM);
+      break;
+    case KEY_LEFT:
+      menu_driver(menu, REQ_LEFT_ITEM);
+      break;
+    }
+    wrefresh(window);
+  }
+
+  // @ Unpost and free all the memory taken up
+  unpost_menu(menu);
+  for (unsigned int i = 0; i < menuChoices.size() + 1; i++)
+    free_item(menuItems[i]);
+  free_menu(menu);
+  endwin();
 }
 
-// clang-format on
 // *** MAIN FUNCTION *** //
 
 int main() {
