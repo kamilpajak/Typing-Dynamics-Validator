@@ -4,7 +4,6 @@
 #include <ncurses.h>
 #include <menu.h>
 #include <cstdlib>
-#include <cstring>
 #include <vector>
 #include <string>
 
@@ -160,11 +159,20 @@ void showMainView() {
   // @ Setup window
   const int windowHeight = 6;
   const int windowWidth = 70;
-  WINDOW *window = newwin(windowHeight, windowWidth, (LINES - windowHeight) / 2, (COLS - windowWidth) / 2);
+  WINDOW *window = newwin(windowHeight, windowWidth, (LINES - windowHeight) / 2,
+                          (COLS - windowWidth) / 2);
   keypad(window, TRUE);
   box(window, 0, 0);
+  std::string title = " Typing Dynamics Validator ";
+  int titleLength = title.length();
+  wattron(window, COLOR_PAIR(1));
+  mvwprintw(window, 0, (windowWidth - titleLength) / 2, "%s", title.c_str());
+  wattroff(window, COLOR_PAIR(1));
+  const int menuHeight = 1;
+  const int menuWidth = 38;
   set_menu_win(menu, window);
-  set_menu_sub(menu, derwin(window, 1, 38, windowHeight - 1, (windowWidth - 38) / 2));
+  set_menu_sub(menu, derwin(window, menuHeight, menuWidth, windowHeight - 1,
+                            (windowWidth - menuWidth) / 2));
 
   // @ Post the menu
   post_menu(menu);
