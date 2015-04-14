@@ -69,7 +69,7 @@ std::vector<input_event> getSample(std::string devicePath) {
 std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   std::vector<keystroke> keystrokes;
   for (unsigned int i = 0; i < events.size() - 1; i++)
-    if (events[i].value == 1)
+    if (events[i].value == KEY_PRESSED)
       for (unsigned int j = i + 1; j < events.size(); j++)
         if (events[i].code == events[j].code) {
           double keyDownTime =
@@ -164,9 +164,8 @@ void showMainView() {
   keypad(window, TRUE);
   box(window, 0, 0);
   std::string title = " Typing Dynamics Validator ";
-  int titleLength = title.length();
   wattron(window, COLOR_PAIR(1));
-  mvwprintw(window, 0, (windowWidth - titleLength) / 2, "%s", title.c_str());
+  mvwprintw(window, 0, (windowWidth - title.length()) / 2, title.c_str());
   wattroff(window, COLOR_PAIR(1));
   const int menuHeight = 1;
   const int menuWidth = 38;
