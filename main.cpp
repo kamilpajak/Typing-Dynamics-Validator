@@ -153,8 +153,8 @@ void showMainView() {
   MENU *menu = new_menu((ITEM **)menuItems);
 
   set_menu_mark(menu, NULL);
-  set_menu_format(menu, 1, menuChoices.size());
   menu_opts_off(menu, O_SHOWDESC);
+  set_menu_format(menu, 1, menuChoices.size());
 
   // @ Setup window
   const int windowHeight = 6;
