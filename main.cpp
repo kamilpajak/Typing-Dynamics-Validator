@@ -1,6 +1,8 @@
 #include <linux/input.h>
 #include <unistd.h> // read()
 #include <fcntl.h>  // open()
+#include <errno.h>
+#include <error.h>
 #include <ncurses.h>
 #include <menu.h>
 #include <cstdlib>
@@ -20,6 +22,22 @@ struct keystroke {
 };
 
 // --- KEYSTROKE FUNCTIONS --- //
+
+// Input device
+std::string executeCommand(const char *cmd) {
+  FILE *pipe = popen(cmd, "r");
+  if (!pipe)
+    error(EXIT_FAILURE, errno, "Pipe error");
+  char buffer[128];
+  std::string result = "";
+  while (!feof(pipe))
+    if (fgets(buffer, 128, pipe) != NULL)
+      result += buffer;
+  pclose(pipe);
+  return result;
+}
+
+std::string getInputDeviceName() {}
 
 // Sample
 bool isEventValid(input_event event) {
