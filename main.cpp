@@ -19,7 +19,8 @@ static const std::string COMMAND_GET_INPUT_DEVICE_NAME =
 static const std::string COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER =
     "grep -E 'Handlers|EV=' /proc/bus/input/devices |"
     "grep -B1 'EV=120013' |"
-    "grep -Eo 'event[0-9]+'";
+    "grep -Eo 'event[0-9]+' |"
+    "grep -Eo '[0-9]+'";
 
 // --- STRUCTURES --- //
 
@@ -50,7 +51,7 @@ std::string getInputDeviceName() {
 }
 
 std::string getInputDevicePath() {
-  return "/dev/input/" +
+  return "/dev/input/event" +
          executeCommand(COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER.c_str());
 }
 
