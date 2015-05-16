@@ -12,6 +12,14 @@
 // --- CONSTANTS --- //
 
 enum { KEY_RELEASED, KEY_PRESSED, KEY_REPEATED };
+static const std::string COMMAND_GET_INPUT_DEVICE_NAME =
+    "grep -E 'Name=|EV=' /proc/bus/input/devices |"
+    "grep -B1 'EV=120013' |"
+    "grep -Po '(?<=\")(.*?)(?=\")'";
+static const std::string COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER =
+    "grep -E 'Handlers|EV=' /proc/bus/input/devices |"
+    "grep -B1 'EV=120013' |"
+    "grep -Eo 'event[0-9]+'";
 
 // --- STRUCTURES --- //
 
@@ -37,7 +45,14 @@ std::string executeCommand(const char *cmd) {
   return result;
 }
 
-std::string getInputDeviceName() {}
+std::string getInputDeviceName() {
+  return executeCommand(COMMAND_GET_INPUT_DEVICE_NAME.c_str());
+}
+
+std::string getInputDevicePath() {
+  return "/dev/input/" +
+         executeCommand(COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER.c_str());
+}
 
 // Sample
 bool isEventValid(input_event event) {
@@ -219,9 +234,8 @@ void showMainView() {
 // *** MAIN FUNCTION *** //
 
 int main() {
-  std::string devicePath = "/dev/input/by-id/"
-                           "usb-Microsft_Microsoft_Wireless_Desktop_Receiver_3."
-                           "1-event-kbd";
-  showMainView();
+
+  //  showMainView();
+  printf(getInputDevicePath().c_str());
   return 0;
 }
