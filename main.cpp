@@ -15,12 +15,14 @@ enum { KEY_RELEASED, KEY_PRESSED, KEY_REPEATED };
 static const std::string COMMAND_GET_INPUT_DEVICE_NAME =
     "grep -E 'Name=|EV=' /proc/bus/input/devices |"
     "grep -B1 'EV=120013' |"
-    "grep -Po '(?<=\")(.*?)(?=\")'";
+    "grep -Po '(?<=\")(.*?)(?=\")' |"
+    "tr -d '\n'";
 static const std::string COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER =
     "grep -E 'Handlers|EV=' /proc/bus/input/devices |"
     "grep -B1 'EV=120013' |"
     "grep -Eo 'event[0-9]+' |"
-    "grep -Eo '[0-9]+'";
+    "grep -Eo '[0-9]+' |"
+    "tr -d '\n'";
 
 // --- STRUCTURES --- //
 
@@ -237,6 +239,7 @@ void showMainView() {
 int main() {
 
   //  showMainView();
-  printf(getInputDevicePath().c_str());
+  std::string inputDeviceName = getInputDevicePath();
+//  printf("%s%s", getInputDeviceName().c_str(), getInputDevicePath().c_str());
   return 0;
 }
