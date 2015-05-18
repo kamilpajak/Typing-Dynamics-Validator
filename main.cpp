@@ -1,11 +1,7 @@
 #include <linux/input.h>
-#include <unistd.h> // read()
-#include <fcntl.h>  // open()
-#include <errno.h>
+#include <fcntl.h>
 #include <error.h>
-#include <ncurses.h>
-#include <menu.h>
-#include <cstdlib>
+#include <cdk/cdk.h>
 #include <vector>
 #include <string>
 
@@ -167,79 +163,44 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 
 // Main view
 void showMainView() {
-  // @ Initialize curses
-  initscr();
-  start_color();
-  cbreak();
-  noecho();
-  curs_set(0);
-  keypad(stdscr, TRUE);
-  init_pair(1, COLOR_RED, COLOR_BLACK);
+  CDKSCREEN *cdkscreen;
+  CDKLABEL *demo;
+  WINDOW *screen;
+  char *mesg[4];
 
-  // @ Setup menu
-  std::vector<std::string> menuChoices;
-  menuChoices.push_back(" < CREATE > ");
-  menuChoices.push_back(" < VERIFY > ");
-  menuChoices.push_back(" <  EXIT  > ");
+  /* Initialize the Cdk screen.   */
+  screen = initscr();
+  cdkscreen = initCDKScreen(screen);
 
-  ITEM **menuItems = (ITEM **)calloc(menuChoices.size() + 1, sizeof(ITEM *));
-  for (unsigned int i = 0; i < menuChoices.size(); i++)
-    menuItems[i] = new_item(menuChoices[i].c_str(), menuChoices[i].c_str());
-  menuItems[menuChoices.size()] = (ITEM *)NULL;
-  MENU *menu = new_menu((ITEM **)menuItems);
+  /* Start CDK Colors */
+  initCDKColor();
 
-  set_menu_mark(menu, NULL);
-  menu_opts_off(menu, O_SHOWDESC);
-  set_menu_format(menu, 1, menuChoices.size());
+  /* Set the labels up.      */
+  mesg[0] = "</31>This line should have a yellow foreground and a cyan "
+            "background.<!31>";
+  mesg[1] = "</05>This line should have a white  foreground and a blue "
+            "background.<!05>";
+  mesg[2] = "</26>This line should have a yellow foreground and a red  "
+            "background.<!26>";
+  mesg[3] = "<C>This line should be set to whatever the screen default is.";
 
-  // @ Setup window
-  const int windowHeight = 6;
-  const int windowWidth = 70;
-  WINDOW *window = newwin(windowHeight, windowWidth, (LINES - windowHeight) / 2,
-                          (COLS - windowWidth) / 2);
-  keypad(window, TRUE);
-  box(window, 0, 0);
-  std::string title = " Typing Dynamics Validator ";
-  wattron(window, COLOR_PAIR(1));
-  mvwprintw(window, 0, (windowWidth - title.length()) / 2, title.c_str());
-  wattroff(window, COLOR_PAIR(1));
-  const int menuHeight = 1;
-  const int menuWidth = 38;
-  set_menu_win(menu, window);
-  set_menu_sub(menu, derwin(window, menuHeight, menuWidth, windowHeight - 1,
-                            (windowWidth - menuWidth) / 2));
+  /* Declare the labels.     */
+  demo = newCDKLabel(cdkscreen, CENTER, CENTER, mesg, 4, TRUE, TRUE);
 
-  // @ Post the menu
-  post_menu(menu);
-  wrefresh(window);
+  /* Draw the label          */
+  drawCDKLabel(demo, TRUE);
+  waitCDKLabel(demo, ' ');
 
-  int keyPressed;
-  while ((keyPressed = wgetch(window))) {
-    switch (keyPressed) {
-    case KEY_RIGHT:
-      menu_driver(menu, REQ_RIGHT_ITEM);
-      break;
-    case KEY_LEFT:
-      menu_driver(menu, REQ_LEFT_ITEM);
-      break;
-    }
-    wrefresh(window);
-  }
-
-  // @ Unpost and free all the memory taken up
-  unpost_menu(menu);
-  for (unsigned int i = 0; i < menuChoices.size() + 1; i++)
-    free_item(menuItems[i]);
-  free_menu(menu);
-  endwin();
+  /* Clean up           */
+  destroyCDKLabel(demo);
+  destroyCDKScreen(cdkscreen);
+  endCDK();
 }
 
 // *** MAIN FUNCTION *** //
 
 int main() {
 
-  //  showMainView();
-  std::string inputDeviceName = getInputDevicePath();
-//  printf("%s%s", getInputDeviceName().c_str(), getInputDevicePath().c_str());
+  showMainView();
   return 0;
 }
