@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <error.h>
 #include <cdk/cdk.h>
+#include <mysql_driver.h>
 #include <vector>
 #include <string>
 
@@ -200,7 +201,6 @@ void showMainView() {
 // *** MAIN FUNCTION *** //
 
 int main() {
-
   showMainView();
   return 0;
 }
