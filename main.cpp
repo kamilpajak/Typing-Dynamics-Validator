@@ -1,6 +1,14 @@
+#include "config.h"
+
 #include <linux/input.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <mysql_driver.h>
+#include <mysql_connection.h>
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
 #include <iostream>
 #include <cstdio>
 #include <vector>
@@ -161,8 +169,6 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 // *** MAIN FUNCTION *** //
 
 int main() {
-  std::string inputDeviceName = getInputDeviceName();
-  std::string inputDevicePath = getInputDevicePath();
   std::string username;
   std::string password;
 
@@ -170,6 +176,33 @@ int main() {
   std::cin >> username;
   std::cout << "Password: ";
   std::cin >> password;
+
+  sql::mysql::MySQL_Driver *driver;
+  sql::Connection *connection;
+  sql::Statement *statement;
+  sql::ResultSet *result;
+
+  driver = sql::mysql::get_mysql_driver_instance();
+  connection = driver->connect(HOST, USER, PASSWORD);
+
+  bool isLogged = false;
+  statement = connection->createStatement();
+  statement->execute("USE typing_dynamics_validator");
+  result = statement->executeQuery("SELECT * FROM user ORDER BY id ASC");
+  while (result->next()) {
+    if (result->getString("username") == username)
+      if (result->getString("password") == password)
+        isLogged = true;
+  }
+
+  if (isLogged)
+    std::cout << "User is logged" << std::endl;
+  else
+    std::cout << "Username and password do not match" << std::endl;
+
+  delete result;
+  delete statement;
+  delete connection;
 
   return 0;
 }
