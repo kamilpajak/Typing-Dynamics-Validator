@@ -86,8 +86,9 @@ void clearInputBuffer() {
   }
 }
 
-std::vector<input_event> getSample(std::string devicePath) {
+std::vector<input_event> getSample() {
   std::vector<input_event> events;
+  std::string devicePath = getInputDevicePath();
   int fileDescriptor = open(devicePath.c_str(), O_RDONLY);
   struct input_event event;
   while (true) {
@@ -169,6 +170,7 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 // *** MAIN FUNCTION *** //
 
 int main() {
+  system("clear");
   std::string username;
   std::string password;
 
@@ -191,12 +193,20 @@ int main() {
   result = statement->executeQuery("SELECT * FROM user ORDER BY id ASC");
   while (result->next()) {
     if (result->getString("username") == username)
-      if (result->getString("password") == password)
+      if (result->getString("password") == password) {
         isLogged = true;
+        break;
+      }
   }
 
-  if (isLogged)
-    std::cout << "User is logged" << std::endl;
+  system("clear");
+  if (isLogged) {
+    std::cout << "You are logged in as " << username << std::endl << std::endl;
+    std::cout << "Please type \"Uniwersytet Slaski\"" << std::endl;
+    std::string enteredText;
+    std::cout << " >>> ";
+    std::cin >> enteredText;
+  }
   else
     std::cout << "Username and password do not match" << std::endl;
 
