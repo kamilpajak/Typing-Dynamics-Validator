@@ -1,20 +1,20 @@
 #include <linux/input.h>
 #include <fcntl.h>
-#include <error.h>
-#include <cdk/cdk.h>
-#include <mysql_driver.h>
+#include <unistd.h>
+#include <iostream>
+#include <cstdio>
 #include <vector>
 #include <string>
 
 // --- CONSTANTS --- //
 
 enum { KEY_RELEASED, KEY_PRESSED, KEY_REPEATED };
-static const std::string COMMAND_GET_INPUT_DEVICE_NAME =
+const std::string COMMAND_GET_INPUT_DEVICE_NAME =
     "grep -E 'Name=|EV=' /proc/bus/input/devices |"
     "grep -B1 'EV=120013' |"
     "grep -Po '(?<=\")(.*?)(?=\")' |"
     "tr -d '\n'";
-static const std::string COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER =
+const std::string COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER =
     "grep -E 'Handlers|EV=' /proc/bus/input/devices |"
     "grep -B1 'EV=120013' |"
     "grep -Eo 'event[0-9]+' |"
@@ -32,10 +32,8 @@ struct keystroke {
 // --- KEYSTROKE FUNCTIONS --- //
 
 // Input device
-std::string executeCommand(const char *cmd) {
-  FILE *pipe = popen(cmd, "r");
-  if (!pipe)
-    error(EXIT_FAILURE, errno, "Pipe error");
+std::string executeCommand(std::string command) {
+  FILE *pipe = popen(command.c_str(), "r");
   char buffer[128];
   std::string result = "";
   while (!feof(pipe))
@@ -74,7 +72,7 @@ bool isEnterPressed(input_event event) {
 void clearInputBuffer() {
   int character;
   while (true) {
-    character = getch();
+    character = std::getchar();
     if (character == '\n' || character == EOF)
       break;
   }
@@ -160,47 +158,18 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 
 // Classifier
 
-// --- USER INTERFACE --- //
-
-// Main view
-void showMainView() {
-  CDKSCREEN *cdkscreen;
-  CDKLABEL *demo;
-  WINDOW *screen;
-  char *mesg[4];
-
-  /* Initialize the Cdk screen.   */
-  screen = initscr();
-  cdkscreen = initCDKScreen(screen);
-
-  /* Start CDK Colors */
-  initCDKColor();
-
-  /* Set the labels up.      */
-  mesg[0] = "</31>This line should have a yellow foreground and a cyan "
-            "background.<!31>";
-  mesg[1] = "</05>This line should have a white  foreground and a blue "
-            "background.<!05>";
-  mesg[2] = "</26>This line should have a yellow foreground and a red  "
-            "background.<!26>";
-  mesg[3] = "<C>This line should be set to whatever the screen default is.";
-
-  /* Declare the labels.     */
-  demo = newCDKLabel(cdkscreen, CENTER, CENTER, mesg, 4, TRUE, TRUE);
-
-  /* Draw the label          */
-  drawCDKLabel(demo, TRUE);
-  waitCDKLabel(demo, ' ');
-
-  /* Clean up           */
-  destroyCDKLabel(demo);
-  destroyCDKScreen(cdkscreen);
-  endCDK();
-}
-
 // *** MAIN FUNCTION *** //
 
 int main() {
-  showMainView();
+  std::string inputDeviceName = getInputDeviceName();
+  std::string inputDevicePath = getInputDevicePath();
+  std::string username;
+  std::string password;
+
+  std::cout << "Username: ";
+  std::cin >> username;
+  std::cout << "Password: ";
+  std::cin >> password;
+
   return 0;
 }
