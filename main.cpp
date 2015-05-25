@@ -170,7 +170,6 @@ std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
 // *** MAIN FUNCTION *** //
 
 int main() {
-  system("clear");
   std::string username;
   std::string password;
 
@@ -199,13 +198,10 @@ int main() {
       }
   }
 
-  system("clear");
   if (isLogged) {
-    std::cout << "You are logged in as " << username << std::endl << std::endl;
+    std::cout << "You are logged in as " << username << std::endl;
     std::cout << "Please type \"Uniwersytet Slaski\"" << std::endl;
-    std::string enteredText;
-    std::cout << " >>> ";
-    std::cin >> enteredText;
+    std::vector<input_event> sample = getSample();
   }
   else
     std::cout << "Username and password do not match" << std::endl;
