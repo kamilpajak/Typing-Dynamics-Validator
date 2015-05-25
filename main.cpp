@@ -1,18 +1,14 @@
 #include "config.h"
 
-#include <linux/input.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <mysql_driver.h>
-#include <mysql_connection.h>
-#include <cppconn/driver.h>
-#include <cppconn/exception.h>
-#include <cppconn/resultset.h>
-#include <cppconn/statement.h>
 #include <iostream>
 #include <cstdio>
 #include <vector>
 #include <string>
+#include <mysql_driver.h>
+#include <cppconn/statement.h>
+#include <linux/input.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 // --- CONSTANTS --- //
 
