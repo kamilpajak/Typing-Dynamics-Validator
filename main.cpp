@@ -75,11 +75,10 @@ bool isEnterPressed(input_event event) {
 
 void clearInputBuffer() {
   int character;
-  while (true) {
-    character = std::getchar();
-    if (character == '\n' || character == EOF)
-      break;
-  }
+  char buffer[BUFSIZ];
+
+  while ((character = std::cin.get()) != '\n' && character != EOF);
+  std::cin.getline(buffer, sizeof(buffer));
 }
 
 std::vector<input_event> getSample() {
