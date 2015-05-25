@@ -77,7 +77,9 @@ void clearInputBuffer() {
   int character;
   char buffer[BUFSIZ];
 
-  while ((character = std::cin.get()) != '\n' && character != EOF);
+  do {
+    character = std::cin.get();
+  } while (character != '\n' && character != EOF);
   std::cin.getline(buffer, sizeof(buffer));
 }
 
@@ -197,8 +199,7 @@ int main() {
     std::cout << "You are logged in as " << username << std::endl;
     std::cout << "Please type \"Uniwersytet Slaski\"" << std::endl;
     std::vector<input_event> sample = getSample();
-  }
-  else
+  } else
     std::cout << "Username and password do not match" << std::endl;
 
   delete result;
