@@ -120,13 +120,14 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   return keystrokes;
 }
 
-bool isEligibleToUpload(std::vector<keystroke> keystrokes) {
+// Password and key codes verification
+bool keyCodesAreCorrect(std::vector<keystroke> providedKeystrokes) {
   std::vector<int> permittedKeyCodes = {42, 22, 49, 23, 17, 18, 19, 31, 21, 20,
                                         18, 20, 57, 42, 31, 38, 30, 31, 37, 23};
 
   std::vector<int> providedKeyCodes;
-  for (unsigned int i = 0; i < keystrokes.size(); i++)
-    providedKeyCodes.push_back(keystrokes[i].keyCode);
+  for (unsigned int i = 0; i < providedKeystrokes.size(); i++)
+    providedKeyCodes.push_back(providedKeystrokes[i].keyCode);
 
   sort(providedKeyCodes.begin(), providedKeyCodes.end());
   sort(permittedKeyCodes.begin(), permittedKeyCodes.end());
