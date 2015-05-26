@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdio>
 #include <vector>
+#include <algorithm>
 #include <string>
 #include <mysql_driver.h>
 #include <cppconn/statement.h>
@@ -119,46 +120,19 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   return keystrokes;
 }
 
-// Features
-std::vector<int> takeKeyCodes(std::vector<keystroke> keystrokes) {
-  std::vector<int> keyCodes;
+bool isEligibleToUpload(std::vector<keystroke> keystrokes) {
+  std::vector<int> permittedKeyCodes = {42, 22, 49, 23, 17, 18, 19, 31, 21, 20,
+                                        18, 20, 57, 42, 31, 38, 30, 31, 37, 23};
+
+  std::vector<int> providedKeyCodes;
   for (unsigned int i = 0; i < keystrokes.size(); i++)
-    keyCodes.push_back(keystrokes[i].keyCode);
-  return keyCodes;
+    providedKeyCodes.push_back(keystrokes[i].keyCode);
+
+  sort(providedKeyCodes.begin(), providedKeyCodes.end());
+  sort(permittedKeyCodes.begin(), permittedKeyCodes.end());
+
+  return (providedKeyCodes == permittedKeyCodes);
 }
-
-std::vector<double> takeDownDownLatencies(std::vector<keystroke> keystrokes) {
-  std::vector<double> downDownLatencies;
-  for (unsigned int i = 1; i < keystrokes.size(); i++) {
-    double downDownLatency =
-        keystrokes[i].keyDownTime - keystrokes[i - 1].keyDownTime;
-    downDownLatencies.push_back(downDownLatency);
-  }
-  return downDownLatencies;
-}
-
-std::vector<double> takeUpDownLatencies(std::vector<keystroke> keystrokes) {
-  std::vector<double> upDownLatencies;
-  for (unsigned int i = 1; i < keystrokes.size(); i++) {
-    double upDownLatency =
-        keystrokes[i].keyDownTime - keystrokes[i - 1].keyUpTime;
-    upDownLatencies.push_back(upDownLatency);
-  }
-  return upDownLatencies;
-}
-
-std::vector<double> takeDownUpLatencies(std::vector<keystroke> keystrokes) {
-  std::vector<double> downUpLatencies;
-  for (unsigned int i = 0; i < keystrokes.size(); i++) {
-    double downUpLatency = keystrokes[i].keyUpTime - keystrokes[i].keyDownTime;
-    downUpLatencies.push_back(downUpLatency);
-  }
-  return downUpLatencies;
-}
-
-// Template
-
-// Classifier
 
 // *** MAIN FUNCTION *** //
 
@@ -196,13 +170,6 @@ int main() {
     std::cout << "Please type \"Uniwersytet Slaski\"" << std::endl;
     std::vector<input_event> events = getEvents();
     std::vector<keystroke> keystrokes = takeKeystrokes(events);
-
-    for (unsigned int i = 0; i < keystrokes.size(); i++)
-      std::cout << keystrokes[i].keyCode << std::endl;
-
-    std::cout << "---" << std::endl;
-    std::cout << keystrokes.size() << std::endl;
-
   } else
     std::cout << "Username and password do not match" << std::endl;
 
