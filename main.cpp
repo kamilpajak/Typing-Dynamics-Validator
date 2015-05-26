@@ -10,14 +10,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-// --- CONSTANTS --- //
-
-enum { KEY_RELEASED, KEY_PRESSED, KEY_REPEATED };
+// Input device
 const std::string COMMAND_GET_INPUT_DEVICE_NAME =
     "grep -E 'Name=|EV=' /proc/bus/input/devices |"
     "grep -B1 'EV=120013' |"
     "grep -Po '(?<=\")(.*?)(?=\")' |"
     "tr -d '\n'";
+
 const std::string COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER =
     "grep -E 'Handlers|EV=' /proc/bus/input/devices |"
     "grep -B1 'EV=120013' |"
@@ -25,17 +24,6 @@ const std::string COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER =
     "grep -Eo '[0-9]+' |"
     "tr -d '\n'";
 
-// --- STRUCTURES --- //
-
-struct keystroke {
-  int keyCode;
-  double keyDownTime;
-  double keyUpTime;
-};
-
-// --- KEYSTROKE FUNCTIONS --- //
-
-// Input device
 std::string executeCommand(std::string command) {
   FILE *pipe = popen(command.c_str(), "r");
   char buffer[128];
@@ -56,7 +44,9 @@ std::string getInputDevicePath() {
          executeCommand(COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER.c_str());
 }
 
-// Sample
+// Raw events
+enum { KEY_RELEASED, KEY_PRESSED, KEY_REPEATED };
+
 bool isEventValid(input_event event) {
   if (event.type == EV_KEY)
     if (event.code != 28 && event.code != 96)
@@ -83,7 +73,7 @@ void clearInputBuffer() {
   std::cin.getline(buffer, sizeof(buffer));
 }
 
-std::vector<input_event> getSample() {
+std::vector<input_event> getEvents() {
   std::vector<input_event> events;
   std::string devicePath = getInputDevicePath();
   int fileDescriptor = open(devicePath.c_str(), O_RDONLY);
@@ -103,6 +93,12 @@ std::vector<input_event> getSample() {
 }
 
 // Keystroke data
+struct keystroke {
+  int keyCode;
+  double keyDownTime;
+  double keyUpTime;
+};
+
 std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   std::vector<keystroke> keystrokes;
   for (unsigned int i = 0; i < events.size() - 1; i++)
@@ -198,7 +194,15 @@ int main() {
   if (isLogged) {
     std::cout << "You are logged in as " << username << std::endl;
     std::cout << "Please type \"Uniwersytet Slaski\"" << std::endl;
-    std::vector<input_event> sample = getSample();
+    std::vector<input_event> events = getEvents();
+    std::vector<keystroke> keystrokes = takeKeystrokes(events);
+
+    for (unsigned int i = 0; i < keystrokes.size(); i++)
+      std::cout << keystrokes[i].keyCode << std::endl;
+
+    std::cout << "---" << std::endl;
+    std::cout << keystrokes.size() << std::endl;
+
   } else
     std::cout << "Username and password do not match" << std::endl;
 
