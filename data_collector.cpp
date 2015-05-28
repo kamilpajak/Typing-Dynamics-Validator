@@ -66,16 +66,6 @@ bool isEnterPressed(input_event event) {
   return false;
 }
 
-void clearInputBuffer() {
-  int character;
-  char buffer[BUFSIZ];
-
-  do {
-    character = std::cin.get();
-  } while (character != '\n' && character != EOF);
-  std::cin.getline(buffer, sizeof(buffer));
-}
-
 std::vector<input_event> getEvents() {
   std::vector<input_event> events;
   std::string devicePath = getInputDevicePath();
@@ -91,7 +81,6 @@ std::vector<input_event> getEvents() {
       break;
   }
   close(fileDescriptor);
-//  clearInputBuffer();
   return events;
 }
 
@@ -122,8 +111,12 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   return keystrokes;
 }
 
-// Password and key codes verification
-bool keyCodesAreCorrect(std::vector<keystroke> providedKeystrokes) {
+// Text and key codes verification
+bool isProvidedTextCorrect(std::string providedText) {
+  return (providedText == "Uniwersytet Slaski");
+}
+
+bool areKeyCodesCorrect(std::vector<keystroke> providedKeystrokes) {
   std::vector<int> permittedKeyCodes = {42, 22, 49, 23, 17, 18, 19, 31, 21, 20,
                                         18, 20, 57, 42, 31, 38, 30, 31, 37, 23};
 
@@ -179,13 +172,16 @@ int main() {
     std::getline(std::cin, providedText);
     std::vector<input_event> events = future.get();
 
-    std::vector<keystroke> keystrokes = takeKeystrokes(events);
-    std::cout << providedText << " - " << keystrokes.size() << std::endl;
-    for (unsigned int i = 0; i < keystrokes.size(); i++)
-      std::cout << keystrokes[i].keyCode << " ";
-    std::cout << std::endl;
-
-
+    if (isProvidedTextCorrect(providedText)) {
+      std::vector<keystroke> keystrokes = takeKeystrokes(events);
+      if (areKeyCodesCorrect(keystrokes)) {
+        std::cout << "Thank you!" << std::endl;
+      } else {
+        std::cout << "Please retype" << std::endl;
+      }
+    } else {
+      std::cout << "Provided text is not correct" << std::endl;
+    }
   } else
     std::cout << "Username and password do not match" << std::endl;
 
