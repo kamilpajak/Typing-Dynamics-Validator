@@ -2,9 +2,11 @@
 
 #include <iostream>
 #include <cstdio>
+#include <string>
 #include <vector>
 #include <algorithm>
-#include <string>
+#include <thread>
+#include <future>
 #include <mysql_driver.h>
 #include <cppconn/statement.h>
 #include <linux/input.h>
@@ -89,7 +91,7 @@ std::vector<input_event> getEvents() {
       break;
   }
   close(fileDescriptor);
-  clearInputBuffer();
+//  clearInputBuffer();
   return events;
 }
 
@@ -143,8 +145,10 @@ int main() {
 
   std::cout << "Username: ";
   std::cin >> username;
+  std::cin.ignore();
   std::cout << "Password: ";
   std::cin >> password;
+  std::cin.ignore();
 
   sql::mysql::MySQL_Driver *driver;
   sql::Connection *connection;
@@ -169,8 +173,19 @@ int main() {
   if (isLogged) {
     std::cout << "You are logged in as " << username << std::endl;
     std::cout << "Please type \"Uniwersytet Slaski\"" << std::endl;
-    std::vector<input_event> events = getEvents();
+    std::string providedText;
+
+    auto future = std::async(std::launch::async, getEvents);
+    std::getline(std::cin, providedText);
+    std::vector<input_event> events = future.get();
+
     std::vector<keystroke> keystrokes = takeKeystrokes(events);
+    std::cout << providedText << " - " << keystrokes.size() << std::endl;
+    for (unsigned int i = 0; i < keystrokes.size(); i++)
+      std::cout << keystrokes[i].keyCode << " ";
+    std::cout << std::endl;
+
+
   } else
     std::cout << "Username and password do not match" << std::endl;
 
