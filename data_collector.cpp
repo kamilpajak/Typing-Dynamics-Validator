@@ -112,8 +112,8 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
 }
 
 // Text and key codes verification (HARD CODED)
-bool isProvidedTextCorrect(std::string providedText) {
-  return (providedText == "Uniwersytet Slaski");
+bool isProvidedStringCorrect(std::string providedString) {
+  return (providedString == "Uniwersytet Slaski");
 }
 
 bool areKeyCodesCorrect(std::vector<keystroke> providedKeystrokes) {
@@ -168,12 +168,12 @@ int main() {
     char selection;
     while (true) {
       std::cout << "Please type \"Uniwersytet Slaski\"" << std::endl;
-      std::string providedText;
+      std::string providedString;
       auto future = std::async(std::launch::async, getEvents);
-      std::getline(std::cin, providedText);
+      std::getline(std::cin, providedString);
       std::vector<input_event> events = future.get();
 
-      if (isProvidedTextCorrect(providedText)) {
+      if (isProvidedStringCorrect(providedString)) {
         std::vector<keystroke> keystrokes = takeKeystrokes(events);
         if (areKeyCodesCorrect(keystrokes)) {
           std::cout << "Thank you! ";
