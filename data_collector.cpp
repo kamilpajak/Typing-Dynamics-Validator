@@ -111,7 +111,7 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
   return keystrokes;
 }
 
-// Text and key codes verification
+// Text and key codes verification (HARD CODED)
 bool isProvidedTextCorrect(std::string providedText) {
   return (providedText == "Uniwersytet Slaski");
 }
@@ -165,22 +165,27 @@ int main() {
 
   if (isLogged) {
     std::cout << "You are logged in as " << username << std::endl;
-    std::cout << "Please type \"Uniwersytet Slaski\"" << std::endl;
-    std::string providedText;
+    char selection;
+    while (true) {
+      std::cout << "Please type \"Uniwersytet Slaski\"" << std::endl;
+      std::string providedText;
+      auto future = std::async(std::launch::async, getEvents);
+      std::getline(std::cin, providedText);
+      std::vector<input_event> events = future.get();
 
-    auto future = std::async(std::launch::async, getEvents);
-    std::getline(std::cin, providedText);
-    std::vector<input_event> events = future.get();
-
-    if (isProvidedTextCorrect(providedText)) {
-      std::vector<keystroke> keystrokes = takeKeystrokes(events);
-      if (areKeyCodesCorrect(keystrokes)) {
-        std::cout << "Thank you!" << std::endl;
-      } else {
-        std::cout << "Please retype" << std::endl;
-      }
-    } else {
-      std::cout << "Provided text is not correct" << std::endl;
+      if (isProvidedTextCorrect(providedText)) {
+        std::vector<keystroke> keystrokes = takeKeystrokes(events);
+        if (areKeyCodesCorrect(keystrokes)) {
+          std::cout << "Thank you! ";
+        } else
+          std::cout << "Keystrokes collection is not correct. ";
+      } else
+        std::cout << "Provided string is not correct. ";
+      std::cout << "Do you want to type again? [Y/n] ";
+      std::cin >> selection;
+      std::cin.ignore();
+      if (selection == 'n' || selection == 'N')
+        break;
     }
   } else
     std::cout << "Username and password do not match" << std::endl;
