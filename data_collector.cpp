@@ -131,10 +131,47 @@ bool areKeyCodesCorrect(std::vector<Keystroke> providedKeystrokes) {
 }
 
 // Database
+bool login(std::string username, std::string password) {
+
+  sql::mysql::MySQL_Driver *driver;
+  driver = sql::mysql::get_mysql_driver_instance();
+  sql::Connection *connection;
+  connection = driver->connect(HOST, USER, PASSWORD);
+
+  sql::Statement *statement;
+  statement = connection->createStatement();
+  statement->execute("USE typing_dynamics_validator");
+  sql::ResultSet *result;
+  result = statement->executeQuery("SELECT * FROM user ORDER BY id ASC");
+  bool isLogged = false;
+  while (result->next()) {
+    if (result->getString("username") == username)
+      if (result->getString("password") == password) {
+        isLogged = true;
+        break;
+      }
+  }
+  delete result;
+  delete statement;
+  delete connection;
+  return isLogged;
+}
+
 void uploadData(std::string username, std::string inputDeviceName,
                 std::vector<Keystroke> keystrokes) {
+  sql::mysql::MySQL_Driver *driver;
+  driver = sql::mysql::get_mysql_driver_instance();
+  sql::Connection *connection;
+  connection = driver->connect(HOST, USER, PASSWORD);
+  sql::Statement *statement;
+  statement = connection->createStatement();
+  statement->execute("USE typing_dynamics_validator");
+  statement->execute("START TRANSACTION;");
+
   for (Keystroke keystroke : keystrokes) {
   }
+
+  statement->execute("COMMIT;");
 }
 
 // *** MAIN FUNCTION *** //
@@ -150,27 +187,7 @@ int main() {
   std::cin >> password;
   std::cin.ignore();
 
-  sql::mysql::MySQL_Driver *driver;
-  sql::Connection *connection;
-  sql::Statement *statement;
-  sql::ResultSet *result;
-
-  driver = sql::mysql::get_mysql_driver_instance();
-  connection = driver->connect(HOST, USER, PASSWORD);
-
-  bool isLogged = false;
-  statement = connection->createStatement();
-  statement->execute("USE typing_dynamics_validator");
-  result = statement->executeQuery("SELECT * FROM user ORDER BY id ASC");
-  while (result->next()) {
-    if (result->getString("username") == username)
-      if (result->getString("password") == password) {
-        isLogged = true;
-        break;
-      }
-  }
-
-  if (isLogged) {
+  if (login(username, password)) {
     std::string inputDeviceName = getInputDeviceName();
     std::cout << "You are logged in as " << username << std::endl;
     char selection;
@@ -198,10 +215,6 @@ int main() {
     }
   } else
     std::cout << "Username and password do not match" << std::endl;
-
-  delete result;
-  delete statement;
-  delete connection;
 
   return 0;
 }
