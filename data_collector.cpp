@@ -85,14 +85,14 @@ std::vector<input_event> getEvents() {
 }
 
 // Keystroke data
-struct keystroke {
+struct Keystroke {
   int keyCode;
   double keyDownTime;
   double keyUpTime;
 };
 
-std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
-  std::vector<keystroke> keystrokes;
+std::vector<Keystroke> takeKeystrokes(std::vector<input_event> events) {
+  std::vector<Keystroke> keystrokes;
   for (unsigned int i = 0; i < events.size() - 1; i++)
     if (events[i].value == KEY_PRESSED)
       for (unsigned int j = i + 1; j < events.size(); j++)
@@ -101,11 +101,11 @@ std::vector<keystroke> takeKeystrokes(std::vector<input_event> events) {
               events[i].time.tv_sec + (double)events[i].time.tv_usec / 1000000;
           double keyUpTime =
               events[j].time.tv_sec + (double)events[j].time.tv_usec / 1000000;
-          keystroke caughtKeystroke;
-          caughtKeystroke.keyCode = events[i].code;
-          caughtKeystroke.keyDownTime = keyDownTime;
-          caughtKeystroke.keyUpTime = keyUpTime;
-          keystrokes.push_back(caughtKeystroke);
+          Keystroke keystroke;
+          keystroke.keyCode = events[i].code;
+          keystroke.keyDownTime = keyDownTime;
+          keystroke.keyUpTime = keyUpTime;
+          keystrokes.push_back(keystroke);
           break;
         }
   return keystrokes;
@@ -116,7 +116,7 @@ bool isProvidedStringCorrect(std::string providedString) {
   return (providedString == "Uniwersytet Slaski");
 }
 
-bool areKeyCodesCorrect(std::vector<keystroke> providedKeystrokes) {
+bool areKeyCodesCorrect(std::vector<Keystroke> providedKeystrokes) {
   std::vector<int> permittedKeyCodes = {42, 22, 49, 23, 17, 18, 19, 31, 21, 20,
                                         18, 20, 57, 42, 31, 38, 30, 31, 37, 23};
 
@@ -132,7 +132,10 @@ bool areKeyCodesCorrect(std::vector<keystroke> providedKeystrokes) {
 
 // Database
 void uploadData(std::string username, std::string inputDeviceName,
-                std::vector<keystroke> keystrokes) {}
+                std::vector<Keystroke> keystrokes) {
+  for (Keystroke keystroke : keystrokes) {
+  }
+}
 
 // *** MAIN FUNCTION *** //
 
@@ -179,7 +182,7 @@ int main() {
       std::vector<input_event> events = future.get();
 
       if (isProvidedStringCorrect(providedString)) {
-        std::vector<keystroke> keystrokes = takeKeystrokes(events);
+        std::vector<Keystroke> keystrokes = takeKeystrokes(events);
         if (areKeyCodesCorrect(keystrokes)) {
           std::cout << "Thank you! ";
           uploadData(username, inputDeviceName, keystrokes);
