@@ -130,6 +130,10 @@ bool areKeyCodesCorrect(std::vector<keystroke> providedKeystrokes) {
   return (providedKeyCodes == permittedKeyCodes);
 }
 
+// Database
+void uploadData(std::string username, std::string inputDeviceName,
+                std::vector<keystroke> keystrokes) {}
+
 // *** MAIN FUNCTION *** //
 
 int main() {
@@ -164,6 +168,7 @@ int main() {
   }
 
   if (isLogged) {
+    std::string inputDeviceName = getInputDeviceName();
     std::cout << "You are logged in as " << username << std::endl;
     char selection;
     while (true) {
@@ -177,6 +182,7 @@ int main() {
         std::vector<keystroke> keystrokes = takeKeystrokes(events);
         if (areKeyCodesCorrect(keystrokes)) {
           std::cout << "Thank you! ";
+          uploadData(username, inputDeviceName, keystrokes);
         } else
           std::cout << "Keystrokes collection is not correct. ";
       } else
