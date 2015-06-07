@@ -169,14 +169,17 @@ void uploadData(std::string username, std::string inputDeviceName,
   sql::Statement *statement;
   statement = connection->createStatement();
   sql::ResultSet *result;
-  result = statement->executeQuery(std::string("SELECT id FROM user WHERE username = '" + username + "\'").c_str());
+  result = statement->executeQuery(
+      std::string("SELECT id FROM user WHERE username = '" + username + "\'")
+          .c_str());
   int userID;
   while (result->next())
     userID = result->getInt("id");
 
   statement->execute("START TRANSACTION;");
   sql::PreparedStatement *preparedStatement;
-  preparedStatement = connection->prepareStatement("INSERT INTO sample(input_device, user_id) VALUES (?, ?)");
+  preparedStatement = connection->prepareStatement(
+      "INSERT INTO sample(input_device, user_id) VALUES (?, ?)");
   preparedStatement->setString(1, inputDeviceName);
   preparedStatement->setInt(2, userID);
   preparedStatement->executeUpdate();
@@ -186,7 +189,9 @@ void uploadData(std::string username, std::string inputDeviceName,
   while (result->next())
     sampleID = result->getInt("LAST_INSERT_ID()");
 
-  preparedStatement = connection->prepareStatement("INSERT INTO keystroke(keyCode, keyDownTime, keyUpTime, sample_id) VALUES (?, ?, ?, ?)");
+  preparedStatement = connection->prepareStatement(
+      "INSERT INTO keystroke(keyCode, keyDownTime, keyUpTime, sample_id) "
+      "VALUES (?, ?, ?, ?)");
   for (Keystroke keystroke : keystrokes) {
     preparedStatement->setInt(1, keystroke.keyCode);
     preparedStatement->setDouble(2, keystroke.keyDownTime);
