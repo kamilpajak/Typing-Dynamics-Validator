@@ -9,6 +9,7 @@
 #include <future>
 #include <mysql_driver.h>
 #include <cppconn/statement.h>
+#include <cppconn/prepared_statement.h>
 #include <linux/input.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -137,10 +138,10 @@ bool login(std::string username, std::string password) {
   driver = sql::mysql::get_mysql_driver_instance();
   sql::Connection *connection;
   connection = driver->connect(HOST, USER, PASSWORD);
+  connection->setSchema("typing_dynamics_validator");
 
   sql::Statement *statement;
   statement = connection->createStatement();
-  statement->execute("USE typing_dynamics_validator");
   sql::ResultSet *result;
   result = statement->executeQuery("SELECT * FROM user ORDER BY id ASC");
   bool isLogged = false;
@@ -163,15 +164,42 @@ void uploadData(std::string username, std::string inputDeviceName,
   driver = sql::mysql::get_mysql_driver_instance();
   sql::Connection *connection;
   connection = driver->connect(HOST, USER, PASSWORD);
+  connection->setSchema("typing_dynamics_validator");
+
   sql::Statement *statement;
   statement = connection->createStatement();
-  statement->execute("USE typing_dynamics_validator");
+  sql::ResultSet *result;
+  result = statement->executeQuery(std::string("SELECT id FROM user WHERE username = '" + username + "\'").c_str());
+  int userID;
+  while (result->next())
+    userID = result->getInt("id");
+
   statement->execute("START TRANSACTION;");
+  sql::PreparedStatement *preparedStatement;
+  preparedStatement = connection->prepareStatement("INSERT INTO sample(input_device, user_id) VALUES (?, ?)");
+  preparedStatement->setString(1, inputDeviceName);
+  preparedStatement->setInt(2, userID);
+  preparedStatement->executeUpdate();
 
+  result = statement->executeQuery("SELECT LAST_INSERT_ID()");
+  int sampleID;
+  while (result->next())
+    sampleID = result->getInt("LAST_INSERT_ID()");
+
+  preparedStatement = connection->prepareStatement("INSERT INTO keystroke(keyCode, keyDownTime, keyUpTime, sample_id) VALUES (?, ?, ?, ?)");
   for (Keystroke keystroke : keystrokes) {
+    preparedStatement->setInt(1, keystroke.keyCode);
+    preparedStatement->setDouble(2, keystroke.keyDownTime);
+    preparedStatement->setDouble(3, keystroke.keyUpTime);
+    preparedStatement->setInt(4, sampleID);
+    preparedStatement->executeUpdate();
   }
-
   statement->execute("COMMIT;");
+
+  delete preparedStatement;
+  delete result;
+  delete statement;
+  delete connection;
 }
 
 // *** MAIN FUNCTION *** //
