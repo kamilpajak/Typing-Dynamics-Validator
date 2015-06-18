@@ -1,4 +1,4 @@
 *
 !.gitignore
-!main.cpp
+!*.cpp
 !*.pro
