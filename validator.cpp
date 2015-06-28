@@ -28,25 +28,23 @@ int main() {
   sql::ResultSet *userIDs = preparedStatement->executeQuery();
 
   while (userIDs->next()) {
-    std::cout << userIDs->getInt("user_id") << std::endl;
     preparedStatement =
         connection->prepareStatement("SELECT id FROM sample WHERE user_id = ?");
     preparedStatement->setInt(1, userIDs->getInt("user_id"));
     sql::ResultSet *sampleIDs = preparedStatement->executeQuery();
 
     while (sampleIDs->next()) {
-      std::cout << sampleIDs->getInt("id") << std::endl;
       preparedStatement = connection->prepareStatement(
           "SELECT keyDownTime, keyUpTime FROM keystroke WHERE sample_id = ?");
       preparedStatement->setInt(1, sampleIDs->getInt("id"));
       sql::ResultSet *keystrokeData = preparedStatement->executeQuery();
 
       while (keystrokeData->next()) {
-        std::cout << keystrokeData->getDouble("keyDownTime") << " - "
-                  << keystrokeData->getDouble("keyUpTime") << std::endl;
       }
+
       delete keystrokeData;
     }
+
     delete sampleIDs;
   }
 
