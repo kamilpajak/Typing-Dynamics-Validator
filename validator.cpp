@@ -7,9 +7,9 @@
 #include <cppconn/prepared_statement.h>
 
 struct sampleFeatures {
-  std::vector<int> downDownTime;
-  std::vector<int> upDownTime;
-  std::vector<int> downUpTime;
+  std::vector<int> downDownDurations;
+  std::vector<int> upDownDurations;
+  std::vector<int> downUpDurations;
 };
 
 int main() {
@@ -37,12 +37,12 @@ int main() {
       preparedStatement = connection->prepareStatement(
           "SELECT keyDownTime, keyUpTime FROM keystroke WHERE sample_id = ?");
       preparedStatement->setInt(1, sampleIDs->getInt("id"));
-      sql::ResultSet *keystrokeData = preparedStatement->executeQuery();
+      sql::ResultSet *keystrokes = preparedStatement->executeQuery();
 
-      while (keystrokeData->next()) {
+      while (keystrokes->next()) {
       }
 
-      delete keystrokeData;
+      delete keystrokes;
     }
 
     delete sampleIDs;
