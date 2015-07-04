@@ -40,15 +40,22 @@ int main() {
     sql::ResultSet *sampleIDs = preparedStatement->executeQuery();
 
     while (sampleIDs->next()) {
-      preparedStatement = connection->prepareStatement(
-          "SELECT keyDownTime, keyUpTime FROM keystroke WHERE sample_id = ?");
+      preparedStatement =
+          connection->prepareStatement("SELECT keyCode, keyDownTime, keyUpTime "
+                                       "FROM keystroke WHERE sample_id = ?");
       preparedStatement->setInt(1, sampleIDs->getInt("id"));
-      sql::ResultSet *keystrokeData = preparedStatement->executeQuery();
+      sql::ResultSet *keystrokeSQL = preparedStatement->executeQuery();
 
-      while (keystrokeData->next()) {
+      std::vector<Keystroke> keystrokes;
+      while (keystrokeSQL->next()) {
+        Keystroke keystroke;
+        keystroke.keyCode = keystrokeSQL->getInt("keyCode");
+        keystroke.keyDownTime = keystrokeSQL->getDouble("keyDownTime");
+        keystroke.keyUpTime = keystrokeSQL->getDouble("keyUpTime");
+        keystrokes.push_back(keystroke);
       }
 
-      delete keystrokeData;
+      delete keystrokeSQL;
     }
 
     delete sampleIDs;
