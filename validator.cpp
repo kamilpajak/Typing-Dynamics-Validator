@@ -13,6 +13,8 @@ struct Keystroke {
 };
 
 struct SummaryOfSampleCharacteristics {
+  int userID;
+  int sampleID;
   std::vector<double> downDownTimes;
   std::vector<double> upDownTimes;
   std::vector<double> downUpTimes;
@@ -51,6 +53,7 @@ std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
 
 int main() {
   int minimalNumberOfSamples = 10;
+  std::vector<SummaryOfSampleCharacteristics> samples;
 
   sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
   sql::PreparedStatement *preparedStatement;
@@ -88,9 +91,12 @@ int main() {
 
       delete keystrokeSQL;
       SummaryOfSampleCharacteristics summaryOfSample;
+      summaryOfSample.userID = userIDs->getInt("user_id");
+      summaryOfSample.sampleID = sampleIDs->getInt("id");
       summaryOfSample.downDownTimes = takeDownDownTimes(keystrokes);
       summaryOfSample.upDownTimes = takeUpDownTimes(keystrokes);
       summaryOfSample.downUpTimes = takeDownUpTimes(keystrokes);
+      samples.push_back(summaryOfSample);
     }
 
     delete sampleIDs;
