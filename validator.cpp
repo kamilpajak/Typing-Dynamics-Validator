@@ -18,6 +18,37 @@ struct sampleFeatures {
   std::vector<double> downUpTimes;
 };
 
+std::vector<double> takeDownDownTimes(std::vector<Keystroke> keystrokes) {
+  std::vector<double> downDownTimes;
+  for (unsigned int i = 1; i < keystrokes.size(); i++) {
+    double downDownTime =
+        keystrokes[i].keyDownTime - keystrokes[i - 1].keyDownTime;
+    downDownTimes.push_back(downDownTime);
+  }
+
+  return downDownTimes;
+}
+
+std::vector<double> takeUpDownTimes(std::vector<Keystroke> keystrokes) {
+  std::vector<double> upDownTimes;
+  for (unsigned int i = 1; i < keystrokes.size(); i++) {
+    double upDownTime = keystrokes[i].keyDownTime - keystrokes[i - 1].keyUpTime;
+    upDownTimes.push_back(upDownTime);
+  }
+
+  return upDownTimes;
+}
+
+std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
+  std::vector<double> downUpTimes;
+  for (unsigned int i = 0; i < keystrokes.size(); i++) {
+    double downUpTime = keystrokes[i].keyUpTime - keystrokes[i].keyDownTime;
+    downUpTimes.push_back(downUpTime);
+  }
+
+  return downUpTimes;
+}
+
 int main() {
   int minimalNumberOfSamples = 10;
 
