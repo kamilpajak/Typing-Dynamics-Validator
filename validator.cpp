@@ -6,14 +6,20 @@
 #include <mysql_driver.h>
 #include <cppconn/prepared_statement.h>
 
+struct Keystroke {
+  int keyCode;
+  double keyDownTime;
+  double keyUpTime;
+};
+
 struct sampleFeatures {
-  std::vector<int> downDownDurations;
-  std::vector<int> upDownDurations;
-  std::vector<int> downUpDurations;
+  std::vector<double> downDownTimes;
+  std::vector<double> upDownTimes;
+  std::vector<double> downUpTimes;
 };
 
 int main() {
-  int usersMinimalNumberOfSamples = 10;
+  int minimalNumberOfSamples = 10;
 
   sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
   sql::PreparedStatement *preparedStatement;
@@ -24,7 +30,7 @@ int main() {
 
   preparedStatement = connection->prepareStatement(
       "SELECT user_id FROM sample GROUP BY user_id HAVING count(*) > ?;");
-  preparedStatement->setInt(1, usersMinimalNumberOfSamples);
+  preparedStatement->setInt(1, minimalNumberOfSamples);
   sql::ResultSet *userIDs = preparedStatement->executeQuery();
 
   while (userIDs->next()) {
@@ -37,12 +43,12 @@ int main() {
       preparedStatement = connection->prepareStatement(
           "SELECT keyDownTime, keyUpTime FROM keystroke WHERE sample_id = ?");
       preparedStatement->setInt(1, sampleIDs->getInt("id"));
-      sql::ResultSet *keystrokes = preparedStatement->executeQuery();
+      sql::ResultSet *keystrokeData = preparedStatement->executeQuery();
 
-      while (keystrokes->next()) {
+      while (keystrokeData->next()) {
       }
 
-      delete keystrokes;
+      delete keystrokeData;
     }
 
     delete sampleIDs;
