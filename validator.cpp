@@ -12,7 +12,7 @@ struct Keystroke {
   double keyUpTime;
 };
 
-struct sampleFeatures {
+struct SummaryOfSampleCharacteristics {
   std::vector<double> downDownTimes;
   std::vector<double> upDownTimes;
   std::vector<double> downUpTimes;
@@ -87,6 +87,10 @@ int main() {
       }
 
       delete keystrokeSQL;
+      SummaryOfSampleCharacteristics summaryOfSample;
+      summaryOfSample.downDownTimes = takeDownDownTimes(keystrokes);
+      summaryOfSample.upDownTimes = takeUpDownTimes(keystrokes);
+      summaryOfSample.downUpTimes = takeDownUpTimes(keystrokes);
     }
 
     delete sampleIDs;
