@@ -22,9 +22,9 @@ struct SummaryOfSampleCharacteristics {
 
 std::vector<double> takeDownDownTimes(std::vector<Keystroke> keystrokes) {
   std::vector<double> downDownTimes;
-  for (unsigned int i = 1; i < keystrokes.size(); i++) {
+  for (unsigned int i = 0; i < keystrokes.size() - 1; i++) {
     double downDownTime =
-        keystrokes[i].keyDownTime - keystrokes[i - 1].keyDownTime;
+        keystrokes[i + 1].keyDownTime - keystrokes[i].keyDownTime;
     downDownTimes.push_back(downDownTime);
   }
 
@@ -33,8 +33,8 @@ std::vector<double> takeDownDownTimes(std::vector<Keystroke> keystrokes) {
 
 std::vector<double> takeUpDownTimes(std::vector<Keystroke> keystrokes) {
   std::vector<double> upDownTimes;
-  for (unsigned int i = 1; i < keystrokes.size(); i++) {
-    double upDownTime = keystrokes[i].keyDownTime - keystrokes[i - 1].keyUpTime;
+  for (unsigned int i = 0; i < keystrokes.size() - 1; i++) {
+    double upDownTime = keystrokes[i + 1].keyDownTime - keystrokes[i].keyUpTime;
     upDownTimes.push_back(upDownTime);
   }
 
