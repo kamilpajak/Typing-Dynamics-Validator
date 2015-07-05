@@ -60,13 +60,13 @@ std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
   return downUpTimes;
 }
 
-Profile takeTemplate(std::vector<SummaryOfSampleCharacteristics> inputSamples) {
+Profile takeProfile(std::vector<SummaryOfSampleCharacteristics> inputSamples) {
   Profile profile;
 }
 
 int main() {
   int minimalNumberOfSamples = 10;
-  int samplesPerTemplate = 10;
+  int samplesPerProfile = 10;
   std::vector<SummaryOfSampleCharacteristics> samples;
   std::vector<Profile> profiles;
   // ------------------------------------------------------------------------ //
@@ -121,8 +121,8 @@ int main() {
   delete preparedStatement;
   delete connection;
   // ------------------------------------------------------------------------ //
-  for (unsigned int i = 0; i < samples.size() - samplesPerTemplate + 1; i++) {
-    if (samples[i].userID == samples[i + samplesPerTemplate - 1].userID) {
+  for (unsigned int i = 0; i < samples.size() - samplesPerProfile + 1; i++) {
+    if (samples[i].userID == samples[i + samplesPerProfile - 1].userID) {
     }
   }
 
