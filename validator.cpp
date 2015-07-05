@@ -20,6 +20,11 @@ struct SummaryOfSampleCharacteristics {
   std::vector<double> downUpTimes;
 };
 
+struct Template {
+  std::vector<double> means;
+  std::vector<double> standardDeviations;
+};
+
 std::vector<double> takeDownDownTimes(std::vector<Keystroke> keystrokes) {
   std::vector<double> downDownTimes;
   for (unsigned int i = 0; i < keystrokes.size() - 1; i++) {
