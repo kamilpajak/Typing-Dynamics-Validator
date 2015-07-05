@@ -20,9 +20,13 @@ struct SummaryOfSampleCharacteristics {
   std::vector<double> downUpTimes;
 };
 
-struct Template {
-  std::vector<double> means;
-  std::vector<double> standardDeviations;
+struct Profile {
+  std::vector<double> downDownMeans;
+  std::vector<double> upDownMeans;
+  std::vector<double> downUpMeans;
+  std::vector<double> downDownStandardDeviations;
+  std::vector<double> upDownStandardDeviations;
+  std::vector<double> downUpStandardDeviations;
 };
 
 std::vector<double> takeDownDownTimes(std::vector<Keystroke> keystrokes) {
@@ -56,10 +60,16 @@ std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
   return downUpTimes;
 }
 
+Profile takeTemplate(std::vector<SummaryOfSampleCharacteristics> inputSamples) {
+  Profile profile;
+}
+
 int main() {
   int minimalNumberOfSamples = 10;
+  int samplesPerTemplate = 10;
   std::vector<SummaryOfSampleCharacteristics> samples;
-
+  std::vector<Profile> profiles;
+  // ------------------------------------------------------------------------ //
   sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
   sql::PreparedStatement *preparedStatement;
   sql::Connection *connection;
@@ -110,6 +120,11 @@ int main() {
   delete userIDs;
   delete preparedStatement;
   delete connection;
+  // ------------------------------------------------------------------------ //
+  for (unsigned int i = 0; i < samples.size() - samplesPerTemplate + 1; i++) {
+    if (samples[i].userID == samples[i + samplesPerTemplate - 1].userID) {
+    }
+  }
 
   return 0;
 }
