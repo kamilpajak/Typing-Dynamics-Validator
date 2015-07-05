@@ -62,6 +62,32 @@ std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
 
 Profile takeProfile(std::vector<SummaryOfSampleCharacteristics> inputSamples) {
   Profile profile;
+
+  std::vector<double> downDownMeans;
+  std::vector<double> upDownMeans;
+  std::vector<double> downUpMeans;
+  double counter;
+
+  for (unsigned int i = 0; i < inputSamples[0].downDownTimes.size(); i++) {
+    counter = 0;
+    for (unsigned int j = 0; j < inputSamples.size(); j++)
+      counter += inputSamples[j].downDownTimes[i];
+    downDownMeans.push_back(counter / inputSamples.size());
+  }
+
+  for (unsigned int i = 0; i < inputSamples[0].upDownTimes.size(); i++) {
+    counter = 0;
+    for (unsigned int j = 0; j < inputSamples.size(); j++)
+      counter += inputSamples[j].upDownTimes[i];
+    upDownMeans.push_back(counter / inputSamples.size());
+  }
+
+  for (unsigned int i = 0; i < inputSamples[0].downUpTimes.size(); i++) {
+    counter = 0;
+    for (unsigned int j = 0; j < inputSamples.size(); j++)
+      counter += inputSamples[j].downUpTimes[i];
+    downUpMeans.push_back(counter / inputSamples.size());
+  }
 }
 
 int main() {
@@ -121,10 +147,6 @@ int main() {
   delete preparedStatement;
   delete connection;
   // ------------------------------------------------------------------------ //
-  for (unsigned int i = 0; i < samples.size() - samplesPerProfile + 1; i++) {
-    if (samples[i].userID == samples[i + samplesPerProfile - 1].userID) {
-    }
-  }
 
   return 0;
 }
