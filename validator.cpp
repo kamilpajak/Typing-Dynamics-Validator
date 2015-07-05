@@ -61,13 +61,17 @@ std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
 }
 
 Profile takeProfile(std::vector<SummaryOfSampleCharacteristics> inputSamples) {
-  Profile profile;
-
   std::vector<double> downDownMeans;
   std::vector<double> upDownMeans;
   std::vector<double> downUpMeans;
+
+  std::vector<double> downDownStandardDeviations;
+  std::vector<double> upDownStandardDeviations;
+  std::vector<double> downUpStandardDeviations;
+
   double counter;
 
+  // Means
   for (unsigned int i = 0; i < inputSamples[0].downDownTimes.size(); i++) {
     counter = 0;
     for (unsigned int j = 0; j < inputSamples.size(); j++)
@@ -88,6 +92,38 @@ Profile takeProfile(std::vector<SummaryOfSampleCharacteristics> inputSamples) {
       counter += inputSamples[j].downUpTimes[i];
     downUpMeans.push_back(counter / inputSamples.size());
   }
+
+  // Standard deviations
+  for (unsigned int i = 0; i < inputSamples[0].downDownTimes.size(); i++) {
+    counter = 0;
+    for (unsigned int j = 0; j < inputSamples.size(); j++)
+      counter += abs(inputSamples[j].downDownTimes[i] - downDownMeans[i]);
+    downDownStandardDeviations.push_back(counter / (inputSamples.size() - 1));
+  }
+
+  for (unsigned int i = 0; i < inputSamples[0].upDownTimes.size(); i++) {
+    counter = 0;
+    for (unsigned int j = 0; j < inputSamples.size(); j++)
+      counter += abs(inputSamples[j].upDownTimes[i] - upDownMeans[i]);
+    upDownStandardDeviations.push_back(counter / (inputSamples.size() - 1));
+  }
+
+  for (unsigned int i = 0; i < inputSamples[0].downUpTimes.size(); i++) {
+    counter = 0;
+    for (unsigned int j = 0; j < inputSamples.size(); j++)
+      counter += abs(inputSamples[j].downUpTimes[i] - downUpMeans[i]);
+    downUpStandardDeviations.push_back(counter / (inputSamples.size() - 1));
+  }
+
+  Profile profile;
+  profile.downDownMeans = downDownMeans;
+  profile.upDownMeans = upDownMeans;
+  profile.downUpMeans = downUpMeans;
+  profile.downDownStandardDeviations = downDownStandardDeviations;
+  profile.upDownStandardDeviations = upDownStandardDeviations;
+  profile.downUpStandardDeviations = downUpStandardDeviations;
+
+  return profile;
 }
 
 int main() {
