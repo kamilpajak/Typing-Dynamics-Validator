@@ -12,7 +12,7 @@ struct Keystroke {
   double keyUpTime;
 };
 
-struct SummaryOfSampleCharacteristics {
+struct SummarizedSample {
   int userID_SQL;
   int sampleID_SQL;
   std::vector<double> downDownTimes;
@@ -62,10 +62,9 @@ std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
   return downUpTimes;
 }
 
-Profile
-takeProfile(std::vector<SummaryOfSampleCharacteristics> summarizedSamples,
-            int beginOfRange, int endOfRange) {
-  std::vector<SummaryOfSampleCharacteristics> inputSamples(
+Profile takeProfile(std::vector<SummarizedSample> summarizedSamples,
+                    int beginOfRange, int endOfRange) {
+  std::vector<SummarizedSample> inputSamples(
       summarizedSamples.begin() + beginOfRange,
       summarizedSamples.begin() + endOfRange);
 
@@ -135,10 +134,12 @@ takeProfile(std::vector<SummaryOfSampleCharacteristics> summarizedSamples,
   return profile;
 }
 
+bool isAuthenticated(Profile profile, SummarizedSample summarizedSample) {}
+
 int main() {
   int minimalNumberOfSamples = 10;
   int samplesPerProfile = 10;
-  std::vector<SummaryOfSampleCharacteristics> summarizedSamples;
+  std::vector<SummarizedSample> summarizedSamples;
   std::vector<Profile> profiles;
   // ------------------------------------------------------------------------ //
   sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
@@ -176,7 +177,7 @@ int main() {
       }
 
       delete keystrokeSQL;
-      SummaryOfSampleCharacteristics summaryOfSample;
+      SummarizedSample summaryOfSample;
       summaryOfSample.userID_SQL = userIDs->getInt("user_id");
       summaryOfSample.sampleID_SQL = sampleIDs->getInt("id");
       summaryOfSample.downDownTimes = takeDownDownTimes(keystrokes);
