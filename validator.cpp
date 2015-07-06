@@ -60,11 +60,14 @@ std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
   return downUpTimes;
 }
 
-Profile takeProfile(std::vector<SummaryOfSampleCharacteristics> inputSamples) {
+Profile takeProfile(std::vector<SummaryOfSampleCharacteristics> samples,
+                    int beginOfRange, int endOfRange) {
+  std::vector<SummaryOfSampleCharacteristics> inputSamples(
+      samples.begin() + beginOfRange, samples.begin() + endOfRange);
+
   std::vector<double> downDownMeans;
   std::vector<double> upDownMeans;
   std::vector<double> downUpMeans;
-
   std::vector<double> downDownStandardDeviations;
   std::vector<double> upDownStandardDeviations;
   std::vector<double> downUpStandardDeviations;
@@ -169,7 +172,7 @@ int main() {
       delete keystrokeSQL;
       SummaryOfSampleCharacteristics summaryOfSample;
       summaryOfSample.userID_SQL = userIDs->getInt("user_id");
-      summaryOfSample.sampleID_SQL= sampleIDs->getInt("id");
+      summaryOfSample.sampleID_SQL = sampleIDs->getInt("id");
       summaryOfSample.downDownTimes = takeDownDownTimes(keystrokes);
       summaryOfSample.upDownTimes = takeUpDownTimes(keystrokes);
       summaryOfSample.downUpTimes = takeDownUpTimes(keystrokes);
