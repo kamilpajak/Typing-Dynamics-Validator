@@ -13,8 +13,8 @@ struct Keystroke {
 };
 
 struct SummaryOfSampleCharacteristics {
-  int userID;
-  int sampleID;
+  int userID_SQL;
+  int sampleID_SQL;
   std::vector<double> downDownTimes;
   std::vector<double> upDownTimes;
   std::vector<double> downUpTimes;
@@ -168,8 +168,8 @@ int main() {
 
       delete keystrokeSQL;
       SummaryOfSampleCharacteristics summaryOfSample;
-      summaryOfSample.userID = userIDs->getInt("user_id");
-      summaryOfSample.sampleID = sampleIDs->getInt("id");
+      summaryOfSample.userID_SQL = userIDs->getInt("user_id");
+      summaryOfSample.sampleID_SQL= sampleIDs->getInt("id");
       summaryOfSample.downDownTimes = takeDownDownTimes(keystrokes);
       summaryOfSample.upDownTimes = takeUpDownTimes(keystrokes);
       summaryOfSample.downUpTimes = takeDownUpTimes(keystrokes);
