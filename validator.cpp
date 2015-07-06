@@ -134,7 +134,27 @@ Profile takeProfile(std::vector<SummarizedSample> summarizedSamples,
   return profile;
 }
 
-bool isAuthenticated(Profile profile, SummarizedSample summarizedSample) {}
+bool isAuthenticated(Profile profile, SummarizedSample summarizedSample) {
+  double D_downDown = 0;
+  double D_downUp = 0;
+  double D_upDown = 0;
+
+  for (unsigned int i = 0; i < summarizedSample.downDownTimes.size(); i++)
+    D_downDown +=
+        (summarizedSample.downDownTimes[i] - profile.downDownMeans[i]) /
+        profile.downDownStandardDeviations[i];
+  D_downDown /= summarizedSample.downDownTimes.size();
+
+  for (unsigned int i = 0; i < summarizedSample.downUpTimes.size(); i++)
+    D_downUp += (summarizedSample.downUpTimes[i] -
+                 profile.downUpMeans[i] / profile.downUpStandardDeviations[i]);
+  D_downUp /= summarizedSample.downUpTimes.size();
+
+  for (unsigned int i = 0; i < summarizedSample.upDownTimes.size(); i++)
+    D_upDown += (summarizedSample.upDownTimes[i] - profile.upDownMeans[i]) /
+                profile.upDownStandardDeviations[i];
+  D_upDown /= summarizedSample.upDownTimes.size();
+}
 
 int main() {
   int minimalNumberOfSamples = 10;
