@@ -21,6 +21,8 @@ struct SummaryOfSampleCharacteristics {
 };
 
 struct Profile {
+  int beginOfRange;
+  int endOfRange;
   std::vector<double> downDownMeans;
   std::vector<double> upDownMeans;
   std::vector<double> downUpMeans;
@@ -60,10 +62,12 @@ std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
   return downUpTimes;
 }
 
-Profile takeProfile(std::vector<SummaryOfSampleCharacteristics> samples,
-                    int beginOfRange, int endOfRange) {
+Profile
+takeProfile(std::vector<SummaryOfSampleCharacteristics> summarizedSamples,
+            int beginOfRange, int endOfRange) {
   std::vector<SummaryOfSampleCharacteristics> inputSamples(
-      samples.begin() + beginOfRange, samples.begin() + endOfRange);
+      summarizedSamples.begin() + beginOfRange,
+      summarizedSamples.begin() + endOfRange);
 
   std::vector<double> downDownMeans;
   std::vector<double> upDownMeans;
@@ -119,6 +123,8 @@ Profile takeProfile(std::vector<SummaryOfSampleCharacteristics> samples,
   }
 
   Profile profile;
+  profile.beginOfRange = beginOfRange;
+  profile.endOfRange = endOfRange;
   profile.downDownMeans = downDownMeans;
   profile.upDownMeans = upDownMeans;
   profile.downUpMeans = downUpMeans;
@@ -132,7 +138,7 @@ Profile takeProfile(std::vector<SummaryOfSampleCharacteristics> samples,
 int main() {
   int minimalNumberOfSamples = 10;
   int samplesPerProfile = 10;
-  std::vector<SummaryOfSampleCharacteristics> samples;
+  std::vector<SummaryOfSampleCharacteristics> summarizedSamples;
   std::vector<Profile> profiles;
   // ------------------------------------------------------------------------ //
   sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
@@ -176,7 +182,7 @@ int main() {
       summaryOfSample.downDownTimes = takeDownDownTimes(keystrokes);
       summaryOfSample.upDownTimes = takeUpDownTimes(keystrokes);
       summaryOfSample.downUpTimes = takeDownUpTimes(keystrokes);
-      samples.push_back(summaryOfSample);
+      summarizedSamples.push_back(summaryOfSample);
     }
 
     delete sampleIDs;
@@ -186,6 +192,13 @@ int main() {
   delete preparedStatement;
   delete connection;
   // ------------------------------------------------------------------------ //
+  for (unsigned int i = 0; i <= summarizedSamples.size() - samplesPerProfile;
+       i++) {
+    if (summarizedSamples[i].userID_SQL ==
+        summarizedSamples[i + samplesPerProfile - 1].userID_SQL)
+      profiles.push_back(
+          takeProfile(summarizedSamples, i, i + samplesPerProfile - 1));
+  }
 
   return 0;
 }
