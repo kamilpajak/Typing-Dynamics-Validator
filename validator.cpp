@@ -147,7 +147,7 @@ bool isAuthenticated(Profile profile, SummarizedSample summarizedSample) {
 
   for (unsigned int i = 0; i < summarizedSample.downUpTimes.size(); i++)
     D_downUp += (summarizedSample.downUpTimes[i] -
-                 profile.downUpMeans[i] / profile.downUpStandardDeviations[i]);
+                 profile.downUpMeans[i]) / profile.downUpStandardDeviations[i];
   D_downUp /= summarizedSample.downUpTimes.size();
 
   for (unsigned int i = 0; i < summarizedSample.upDownTimes.size(); i++)
