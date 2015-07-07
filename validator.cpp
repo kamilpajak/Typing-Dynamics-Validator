@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cmath>
 #include <mysql_driver.h>
 #include <cppconn/prepared_statement.h>
 
@@ -103,21 +104,21 @@ Profile takeProfile(std::vector<SummarizedSample> summarizedSamples,
   for (unsigned int i = 0; i < inputSamples[0].downDownTimes.size(); i++) {
     counter = 0;
     for (unsigned int j = 0; j < inputSamples.size(); j++)
-      counter += abs(inputSamples[j].downDownTimes[i] - downDownMeans[i]);
+      counter += std::abs(inputSamples[j].downDownTimes[i] - downDownMeans[i]);
     downDownStandardDeviations.push_back(counter / (inputSamples.size() - 1));
   }
 
   for (unsigned int i = 0; i < inputSamples[0].upDownTimes.size(); i++) {
     counter = 0;
     for (unsigned int j = 0; j < inputSamples.size(); j++)
-      counter += abs(inputSamples[j].upDownTimes[i] - upDownMeans[i]);
+      counter += std::abs(inputSamples[j].upDownTimes[i] - upDownMeans[i]);
     upDownStandardDeviations.push_back(counter / (inputSamples.size() - 1));
   }
 
   for (unsigned int i = 0; i < inputSamples[0].downUpTimes.size(); i++) {
     counter = 0;
     for (unsigned int j = 0; j < inputSamples.size(); j++)
-      counter += abs(inputSamples[j].downUpTimes[i] - downUpMeans[i]);
+      counter += std::abs(inputSamples[j].downUpTimes[i] - downUpMeans[i]);
     downUpStandardDeviations.push_back(counter / (inputSamples.size() - 1));
   }
 
