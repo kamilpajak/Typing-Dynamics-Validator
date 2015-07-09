@@ -136,25 +136,27 @@ Profile takeProfile(std::vector<SummarizedSample> summarizedSamples,
 }
 
 bool isAuthenticated(Profile profile, SummarizedSample summarizedSample) {
-  double D_downDown = 0;
-  double D_downUp = 0;
-  double D_upDown = 0;
+  double distanceDownDown = 0;
+  double distanceDownUp = 0;
+  double distanceUpDown = 0;
 
   for (unsigned int i = 0; i < summarizedSample.downDownTimes.size(); i++)
-    D_downDown +=
+    distanceDownDown +=
         (summarizedSample.downDownTimes[i] - profile.downDownMeans[i]) /
         profile.downDownStandardDeviations[i];
-  D_downDown /= summarizedSample.downDownTimes.size();
+  distanceDownDown /= summarizedSample.downDownTimes.size();
 
   for (unsigned int i = 0; i < summarizedSample.downUpTimes.size(); i++)
-    D_downUp += (summarizedSample.downUpTimes[i] - profile.downUpMeans[i]) /
-                profile.downUpStandardDeviations[i];
-  D_downUp /= summarizedSample.downUpTimes.size();
+    distanceDownUp +=
+        (summarizedSample.downUpTimes[i] - profile.downUpMeans[i]) /
+        profile.downUpStandardDeviations[i];
+  distanceDownUp /= summarizedSample.downUpTimes.size();
 
   for (unsigned int i = 0; i < summarizedSample.upDownTimes.size(); i++)
-    D_upDown += (summarizedSample.upDownTimes[i] - profile.upDownMeans[i]) /
-                profile.upDownStandardDeviations[i];
-  D_upDown /= summarizedSample.upDownTimes.size();
+    distanceUpDown +=
+        (summarizedSample.upDownTimes[i] - profile.upDownMeans[i]) /
+        profile.upDownStandardDeviations[i];
+  distanceUpDown /= summarizedSample.upDownTimes.size();
 }
 
 int main() {
