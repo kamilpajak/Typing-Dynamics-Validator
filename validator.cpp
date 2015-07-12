@@ -22,6 +22,7 @@ struct SummarizedSample {
 };
 
 struct Profile {
+  int userID_SQL;
   int beginOfRange;
   int endOfRange;
   std::vector<double> downDownMeans;
@@ -123,6 +124,7 @@ Profile takeProfile(std::vector<SummarizedSample> summarizedSamples,
   }
 
   Profile profile;
+  profile.userID_SQL = inputSamples[0].userID_SQL;
   profile.beginOfRange = beginOfRange;
   profile.endOfRange = endOfRange;
   profile.downDownMeans = downDownMeans;
@@ -157,6 +159,9 @@ bool isAuthenticated(Profile profile, SummarizedSample summarizedSample) {
         (summarizedSample.upDownTimes[i] - profile.upDownMeans[i]) /
         profile.upDownStandardDeviations[i];
   distanceUpDown /= summarizedSample.upDownTimes.size();
+  std::cout << "Distance DD: " << distanceDownDown
+            << " Distance DU: " << distanceDownUp
+            << " Distance UD: " << distanceUpDown << std::endl << std::endl;
 }
 
 int main() {
@@ -223,6 +228,20 @@ int main() {
       profiles.push_back(
           takeProfile(summarizedSamples, i, i + samplesPerProfile - 1));
   }
+
+  for (unsigned int i = 0; i < profiles.size(); i++)
+    for (unsigned int j = 0; j < summarizedSamples.size(); j++)
+      if ((j > profiles[i].endOfRange || j < profiles[i].beginOfRange) &&
+          profiles[i].userID_SQL == 9 && summarizedSamples[j].userID_SQL == 9) {
+        std::cout << "Profile ("
+                  << summarizedSamples[profiles[i].beginOfRange].sampleID_SQL
+                  << "-"
+                  << summarizedSamples[profiles[i].endOfRange].sampleID_SQL
+                  << ") "
+                  << " Sample: " << summarizedSamples[j].sampleID_SQL
+                  << " user: " << summarizedSamples[j].userID_SQL << std::endl;
+        isAuthenticated(profiles[i], summarizedSamples[j]);
+      }
 
   return 0;
 }
