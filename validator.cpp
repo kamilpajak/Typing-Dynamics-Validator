@@ -125,14 +125,14 @@ Profile takeProfile(std::vector<SummarizedSample> summarizedSamples,
 
   Profile profile;
   profile.userID_SQL = inputSamples[0].userID_SQL;
-  profile.beginOfRange = beginOfRange;
-  profile.endOfRange = endOfRange;
   profile.downDownMeans = downDownMeans;
   profile.upDownMeans = upDownMeans;
   profile.downUpMeans = downUpMeans;
   profile.downDownStandardDeviations = downDownStandardDeviations;
   profile.upDownStandardDeviations = upDownStandardDeviations;
   profile.downUpStandardDeviations = downUpStandardDeviations;
+  profile.beginOfRange = beginOfRange;
+  profile.endOfRange = endOfRange;
 
   return profile;
 }
