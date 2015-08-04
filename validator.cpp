@@ -33,12 +33,6 @@ struct Profile {
   int endOfRange;
 };
 
-struct Threshold {
-  double thresholdDownDown;
-  double thresholdUpDown;
-  double thresholdDownUp;
-};
-
 std::vector<double> takeDownDownTimes(std::vector<Keystroke> keystrokes) {
   std::vector<double> downDownTimes;
   for (unsigned int i = 0; i < keystrokes.size() - 1; i++) {
@@ -142,18 +136,13 @@ Profile takeProfile(std::vector<Sample> samples, int beginOfRange,
   return profile;
 }
 
-Threshold determineThreshold(Profile profile) {
-  double meanOfDownDownStandardDeviations = 0;
-  double meanOfUpDownStandardDeviations = 0;
-  double meanOfDownUpStandardDeviations = 0;
-}
-
 int main() {
   int minimalNumberOfSamples = 10;
   int samplesPerProfile = 10;
   std::vector<Sample> samples;
   std::vector<Profile> profiles;
-  // ------------------------------------------------------------------------ //
+
+  // Take keystroke data from MySQL server
   sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
   sql::PreparedStatement *preparedStatement;
   sql::Connection *connection;
@@ -204,7 +193,6 @@ int main() {
   delete userIDs;
   delete preparedStatement;
   delete connection;
-  // ------------------------------------------------------------------------ //
 
   // Take all profiles
   for (unsigned int i = 0; i <= samples.size() - samplesPerProfile; i++) {
