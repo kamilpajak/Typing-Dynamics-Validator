@@ -13,7 +13,7 @@ struct Keystroke {
   double keyUpTime;
 };
 
-struct SummarizedSample {
+struct sample {
   int userID_SQL;
   int sampleID_SQL;
   std::vector<double> downDownTimes;
@@ -31,6 +31,12 @@ struct Profile {
   std::vector<double> downUpStandardDeviations;
   int beginOfRange;
   int endOfRange;
+};
+
+struct Threshold {
+  double thresholdDownDown;
+  double thresholdUpDown;
+  double thresholdDownUp;
 };
 
 std::vector<double> takeDownDownTimes(std::vector<Keystroke> keystrokes) {
@@ -64,11 +70,10 @@ std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
   return downUpTimes;
 }
 
-Profile takeProfile(std::vector<SummarizedSample> summarizedSamples,
-                    int beginOfRange, int endOfRange) {
-  std::vector<SummarizedSample> inputSamples(
-      summarizedSamples.begin() + beginOfRange,
-      summarizedSamples.begin() + endOfRange);
+Profile takeProfile(std::vector<sample> samples, int beginOfRange,
+                    int endOfRange) {
+  std::vector<sample> inputSamples(samples.begin() + beginOfRange,
+                                   samples.begin() + endOfRange);
 
   std::vector<double> downDownMeans;
   std::vector<double> upDownMeans;
@@ -137,34 +142,16 @@ Profile takeProfile(std::vector<SummarizedSample> summarizedSamples,
   return profile;
 }
 
-bool isAuthenticated(Profile profile, SummarizedSample summarizedSample) {
-  double distanceDownDown = 0;
-  double distanceDownUp = 0;
-  double distanceUpDown = 0;
-
-  for (unsigned int i = 0; i < summarizedSample.downDownTimes.size(); i++)
-    distanceDownDown +=
-        (summarizedSample.downDownTimes[i] - profile.downDownMeans[i]) /
-        profile.downDownStandardDeviations[i];
-  distanceDownDown /= summarizedSample.downDownTimes.size();
-
-  for (unsigned int i = 0; i < summarizedSample.downUpTimes.size(); i++)
-    distanceDownUp +=
-        (summarizedSample.downUpTimes[i] - profile.downUpMeans[i]) /
-        profile.downUpStandardDeviations[i];
-  distanceDownUp /= summarizedSample.downUpTimes.size();
-
-  for (unsigned int i = 0; i < summarizedSample.upDownTimes.size(); i++)
-    distanceUpDown +=
-        (summarizedSample.upDownTimes[i] - profile.upDownMeans[i]) /
-        profile.upDownStandardDeviations[i];
-  distanceUpDown /= summarizedSample.upDownTimes.size();
+Threshold determineThreshold(Profile profile) {
+  double meanOfDownDownStandardDeviations = 0;
+  double meanOfUpDownStandardDeviations = 0;
+  double meanOfDownUpStandardDeviations = 0;
 }
 
 int main() {
   int minimalNumberOfSamples = 10;
   int samplesPerProfile = 10;
-  std::vector<SummarizedSample> summarizedSamples;
+  std::vector<sample> samples;
   std::vector<Profile> profiles;
   // ------------------------------------------------------------------------ //
   sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
@@ -202,13 +189,13 @@ int main() {
       }
 
       delete keystrokeSQL;
-      SummarizedSample summaryOfSample;
-      summaryOfSample.userID_SQL = userIDs->getInt("user_id");
-      summaryOfSample.sampleID_SQL = sampleIDs->getInt("id");
-      summaryOfSample.downDownTimes = takeDownDownTimes(keystrokes);
-      summaryOfSample.upDownTimes = takeUpDownTimes(keystrokes);
-      summaryOfSample.downUpTimes = takeDownUpTimes(keystrokes);
-      summarizedSamples.push_back(summaryOfSample);
+      sample sample;
+      sample.userID_SQL = userIDs->getInt("user_id");
+      sample.sampleID_SQL = sampleIDs->getInt("id");
+      sample.downDownTimes = takeDownDownTimes(keystrokes);
+      sample.upDownTimes = takeUpDownTimes(keystrokes);
+      sample.downUpTimes = takeDownUpTimes(keystrokes);
+      samples.push_back(sample);
     }
 
     delete sampleIDs;
@@ -218,12 +205,11 @@ int main() {
   delete preparedStatement;
   delete connection;
   // ------------------------------------------------------------------------ //
-  for (unsigned int i = 0; i <= summarizedSamples.size() - samplesPerProfile;
-       i++) {
-    if (summarizedSamples[i].userID_SQL ==
-        summarizedSamples[i + samplesPerProfile - 1].userID_SQL)
-      profiles.push_back(
-          takeProfile(summarizedSamples, i, i + samplesPerProfile - 1));
+
+  // Take all profiles
+  for (unsigned int i = 0; i <= samples.size() - samplesPerProfile; i++) {
+    if (samples[i].userID_SQL == samples[i + samplesPerProfile - 1].userID_SQL)
+      profiles.push_back(takeProfile(samples, i, i + samplesPerProfile - 1));
   }
 
   return 0;
