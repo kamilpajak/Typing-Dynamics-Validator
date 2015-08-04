@@ -33,6 +33,18 @@ struct Profile {
   int endOfRange;
 };
 
+struct Distance {
+  double downDown;
+  double upDown;
+  double downUp;
+};
+
+struct Threshold {
+  double downDown;
+  double upDown;
+  double downUp;
+};
+
 std::vector<double> takeDownDownTimes(std::vector<Keystroke> keystrokes) {
   std::vector<double> downDownTimes;
   for (unsigned int i = 0; i < keystrokes.size() - 1; i++) {
@@ -136,6 +148,55 @@ Profile takeProfile(std::vector<Sample> samples, int beginOfRange,
   return profile;
 }
 
+Distance calculateDistance(Profile profile, Sample sample) {
+  Distance distance;
+  distance.downDown = 0;
+  distance.upDown = 0;
+  distance.downUp = 0;
+
+  for (unsigned int i = 0; i < sample.downDownTimes.size(); i++)
+    distance.downDown += (sample.downDownTimes[i] - profile.downDownMeans[i]) /
+                         profile.downDownStandardDeviations[i];
+  distance.downDown /= sample.downDownTimes.size();
+
+  for (unsigned int i = 0; i < sample.upDownTimes.size(); i++)
+    distance.upDown += (sample.upDownTimes[i] - profile.upDownMeans[i]) /
+                       profile.upDownStandardDeviations[i];
+  distance.upDown /= sample.upDownTimes.size();
+
+  for (unsigned int i = 0; i < sample.downUpTimes.size(); i++)
+    distance.downUp += (sample.downUpTimes[i] - profile.downUpMeans[i]) /
+                       profile.downUpStandardDeviations[i];
+  distance.downUp /= sample.downUpTimes.size();
+
+  return distance;
+}
+
+Threshold determineThreshold(Profile profile) {
+  Threshold threshold;
+  threshold.downDown = 0;
+  threshold.upDown = 0;
+  threshold.downUp = 0;
+  double meanOfStandardDeviations;
+
+  meanOfStandardDeviations = 0;
+  for (double downDownStandardDeviation : profile.downDownStandardDeviations)
+    meanOfStandardDeviations += downDownStandardDeviation;
+  meanOfStandardDeviations /= profile.downDownStandardDeviations.size();
+
+  meanOfStandardDeviations = 0;
+  for (double upDownStandardDeviation : profile.upDownStandardDeviations)
+    meanOfStandardDeviations += upDownStandardDeviation;
+  meanOfStandardDeviations /= profile.upDownStandardDeviations.size();
+
+  meanOfStandardDeviations = 0;
+  for (double downUpStandardDeviation : profile.downUpStandardDeviations)
+    meanOfStandardDeviations += downUpStandardDeviation;
+  meanOfStandardDeviations /= profile.downUpStandardDeviations.size();
+
+  return threshold;
+}
+
 int main() {
   int minimalNumberOfSamples = 10;
   int samplesPerProfile = 10;
@@ -199,6 +260,14 @@ int main() {
     if (samples[i].userID_SQL == samples[i + samplesPerProfile - 1].userID_SQL)
       profiles.push_back(takeProfile(samples, i, i + samplesPerProfile - 1));
   }
+
+  int profileIndex = 221;
+  int sampleIndex = 0;
+
+  std::cout << "Profile of user " << profiles[profileIndex].userID_SQL << " vs sample of user " << samples[sampleIndex].userID_SQL << std::endl;
+  std::cout << "Distances (DD, UD, DU):" << std::endl;
+  Distance distance = calculateDistance(profiles[profileIndex], samples[sampleIndex]);
+  std::cout << distance.downDown << ", " << distance.upDown << ", " << distance.downUp << std::endl;
 
   return 0;
 }
