@@ -13,7 +13,7 @@ struct Keystroke {
   double keyUpTime;
 };
 
-struct sample {
+struct Sample {
   int userID_SQL;
   int sampleID_SQL;
   std::vector<double> downDownTimes;
@@ -70,9 +70,9 @@ std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
   return downUpTimes;
 }
 
-Profile takeProfile(std::vector<sample> samples, int beginOfRange,
+Profile takeProfile(std::vector<Sample> samples, int beginOfRange,
                     int endOfRange) {
-  std::vector<sample> inputSamples(samples.begin() + beginOfRange,
+  std::vector<Sample> inputSamples(samples.begin() + beginOfRange,
                                    samples.begin() + endOfRange);
 
   std::vector<double> downDownMeans;
@@ -151,7 +151,7 @@ Threshold determineThreshold(Profile profile) {
 int main() {
   int minimalNumberOfSamples = 10;
   int samplesPerProfile = 10;
-  std::vector<sample> samples;
+  std::vector<Sample> samples;
   std::vector<Profile> profiles;
   // ------------------------------------------------------------------------ //
   sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
@@ -189,7 +189,7 @@ int main() {
       }
 
       delete keystrokeSQL;
-      sample sample;
+      Sample sample;
       sample.userID_SQL = userIDs->getInt("user_id");
       sample.sampleID_SQL = sampleIDs->getInt("id");
       sample.downDownTimes = takeDownDownTimes(keystrokes);
