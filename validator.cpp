@@ -20,15 +20,13 @@ struct Sample {
 };
 
 struct Profile {
-  int userID_SQL;
   std::vector<double> downDownMeans;
   std::vector<double> upDownMeans;
   std::vector<double> downUpMeans;
   std::vector<double> downDownStandardDeviations;
   std::vector<double> upDownStandardDeviations;
   std::vector<double> downUpStandardDeviations;
-  int beginOfRange;
-  int endOfRange;
+  std::vector<Sample> trainingSet;
 };
 
 struct Distance {
@@ -46,8 +44,7 @@ struct Threshold {
 std::vector<double> takeDownDownTimes(std::vector<Keystroke> keystrokes) {
   std::vector<double> downDownTimes;
   for (unsigned int i = 0; i < keystrokes.size() - 1; i++) {
-    double downDownTime =
-        keystrokes[i + 1].keyDownTime - keystrokes[i].keyDownTime;
+    double downDownTime = keystrokes[i + 1].keyDownTime - keystrokes[i].keyDownTime;
     downDownTimes.push_back(downDownTime);
   }
 
@@ -74,7 +71,7 @@ std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
   return downUpTimes;
 }
 
-std::map<int, std::map<int, Sample>> summarizeKeystrokes(int minimumSamples) {
+std::map<int, std::map<int, Sample>> summarizeKeystrokeData(int minimumSamples) {
   std::map<int, std::map<int, Sample>> samples;
 
   sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
@@ -127,74 +124,55 @@ std::map<int, std::map<int, Sample>> summarizeKeystrokes(int minimumSamples) {
   return samples;
 }
 
-Profile takeProfile(std::vector<Sample> samples, int beginOfRange,
-                    int endOfRange) {
-  std::vector<Sample> inputSamples(samples.begin() + beginOfRange,
-                                   samples.begin() + endOfRange);
-
-  std::vector<double> downDownMeans;
-  std::vector<double> upDownMeans;
-  std::vector<double> downUpMeans;
-  std::vector<double> downDownStandardDeviations;
-  std::vector<double> upDownStandardDeviations;
-  std::vector<double> downUpStandardDeviations;
-
+Profile takeProfile(std::vector<Sample> trainingSet) {
+  Profile profile;
   double counter;
 
+  profile.trainingSet = trainingSet;
+
   // Means
-  for (unsigned int i = 0; i < inputSamples[0].downDownTimes.size(); i++) {
+  for (unsigned int i = 0; i < trainingSet[0].downDownTimes.size(); i++) {
     counter = 0;
-    for (unsigned int j = 0; j < inputSamples.size(); j++)
-      counter += inputSamples[j].downDownTimes[i];
-    downDownMeans.push_back(counter / inputSamples.size());
+    for (unsigned int j = 0; j < trainingSet.size(); j++)
+      counter += trainingSet[j].downDownTimes[i];
+    profile.downDownMeans.push_back(counter / trainingSet.size());
   }
 
-  for (unsigned int i = 0; i < inputSamples[0].upDownTimes.size(); i++) {
+  for (unsigned int i = 0; i < trainingSet[0].upDownTimes.size(); i++) {
     counter = 0;
-    for (unsigned int j = 0; j < inputSamples.size(); j++)
-      counter += inputSamples[j].upDownTimes[i];
-    upDownMeans.push_back(counter / inputSamples.size());
+    for (unsigned int j = 0; j < trainingSet.size(); j++)
+      counter += trainingSet[j].upDownTimes[i];
+    profile.upDownMeans.push_back(counter / trainingSet.size());
   }
 
-  for (unsigned int i = 0; i < inputSamples[0].downUpTimes.size(); i++) {
+  for (unsigned int i = 0; i < trainingSet[0].downUpTimes.size(); i++) {
     counter = 0;
-    for (unsigned int j = 0; j < inputSamples.size(); j++)
-      counter += inputSamples[j].downUpTimes[i];
-    downUpMeans.push_back(counter / inputSamples.size());
+    for (unsigned int j = 0; j < trainingSet.size(); j++)
+      counter += trainingSet[j].downUpTimes[i];
+    profile.downUpMeans.push_back(counter / trainingSet.size());
   }
 
   // Standard deviations
-  for (unsigned int i = 0; i < inputSamples[0].downDownTimes.size(); i++) {
+  for (unsigned int i = 0; i < trainingSet[0].downDownTimes.size(); i++) {
     counter = 0;
-    for (unsigned int j = 0; j < inputSamples.size(); j++)
-      counter += std::abs(inputSamples[j].downDownTimes[i] - downDownMeans[i]);
-    downDownStandardDeviations.push_back(counter / (inputSamples.size() - 1));
+    for (unsigned int j = 0; j < trainingSet.size(); j++)
+      counter += std::abs(trainingSet[j].downDownTimes[i] - profile.downDownMeans[i]);
+    profile.downDownStandardDeviations.push_back(counter / (trainingSet.size() - 1));
   }
 
-  for (unsigned int i = 0; i < inputSamples[0].upDownTimes.size(); i++) {
+  for (unsigned int i = 0; i < trainingSet[0].upDownTimes.size(); i++) {
     counter = 0;
-    for (unsigned int j = 0; j < inputSamples.size(); j++)
-      counter += std::abs(inputSamples[j].upDownTimes[i] - upDownMeans[i]);
-    upDownStandardDeviations.push_back(counter / (inputSamples.size() - 1));
+    for (unsigned int j = 0; j < trainingSet.size(); j++)
+      counter += std::abs(trainingSet[j].upDownTimes[i] - profile.upDownMeans[i]);
+    profile.upDownStandardDeviations.push_back(counter / (trainingSet.size() - 1));
   }
 
-  for (unsigned int i = 0; i < inputSamples[0].downUpTimes.size(); i++) {
+  for (unsigned int i = 0; i < trainingSet[0].downUpTimes.size(); i++) {
     counter = 0;
-    for (unsigned int j = 0; j < inputSamples.size(); j++)
-      counter += std::abs(inputSamples[j].downUpTimes[i] - downUpMeans[i]);
-    downUpStandardDeviations.push_back(counter / (inputSamples.size() - 1));
+    for (unsigned int j = 0; j < trainingSet.size(); j++)
+      counter += std::abs(trainingSet[j].downUpTimes[i] - profile.downUpMeans[i]);
+    profile.downUpStandardDeviations.push_back(counter / (trainingSet.size() - 1));
   }
-
-  Profile profile;
-
-  profile.downDownMeans = downDownMeans;
-  profile.upDownMeans = upDownMeans;
-  profile.downUpMeans = downUpMeans;
-  profile.downDownStandardDeviations = downDownStandardDeviations;
-  profile.upDownStandardDeviations = upDownStandardDeviations;
-  profile.downUpStandardDeviations = downUpStandardDeviations;
-  profile.beginOfRange = beginOfRange;
-  profile.endOfRange = endOfRange;
 
   return profile;
 }
@@ -206,18 +184,15 @@ Distance calculateDistance(Profile profile, Sample sample) {
   distance.downUp = 0;
 
   for (unsigned int i = 0; i < sample.downDownTimes.size(); i++)
-    distance.downDown += (sample.downDownTimes[i] - profile.downDownMeans[i]) /
-                         profile.downDownStandardDeviations[i];
+    distance.downDown += (sample.downDownTimes[i] - profile.downDownMeans[i]) / profile.downDownStandardDeviations[i];
   distance.downDown /= sample.downDownTimes.size();
 
   for (unsigned int i = 0; i < sample.upDownTimes.size(); i++)
-    distance.upDown += (sample.upDownTimes[i] - profile.upDownMeans[i]) /
-                       profile.upDownStandardDeviations[i];
+    distance.upDown += (sample.upDownTimes[i] - profile.upDownMeans[i]) / profile.upDownStandardDeviations[i];
   distance.upDown /= sample.upDownTimes.size();
 
   for (unsigned int i = 0; i < sample.downUpTimes.size(); i++)
-    distance.downUp += (sample.downUpTimes[i] - profile.downUpMeans[i]) /
-                       profile.downUpStandardDeviations[i];
+    distance.downUp += (sample.downUpTimes[i] - profile.downUpMeans[i]) / profile.downUpStandardDeviations[i];
   distance.downUp /= sample.downUpTimes.size();
 
   return distance;
@@ -250,7 +225,9 @@ Threshold determineThreshold(Profile profile) {
 
 int main() {
   std::map<int, std::map<int, Sample>> samples;
-  samples = summarizeKeystrokes(10);
+  std::map<int, std::vector<Profile>> profiles;
+
+  samples = summarizeKeystrokeData(10);
 
   return 0;
 }
