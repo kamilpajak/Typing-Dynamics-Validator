@@ -7,38 +7,17 @@
 #include <mysql_driver.h>
 #include <cppconn/prepared_statement.h>
 
-struct Keystroke {
-  int keyCode;
-  double keyDownTime;
-  double keyUpTime;
-};
-
+// Summarized samples
 struct Sample {
   std::vector<double> downDownTimes;
   std::vector<double> upDownTimes;
   std::vector<double> downUpTimes;
 };
 
-struct Profile {
-  std::vector<double> downDownMeans;
-  std::vector<double> upDownMeans;
-  std::vector<double> downUpMeans;
-  std::vector<double> downDownStandardDeviations;
-  std::vector<double> upDownStandardDeviations;
-  std::vector<double> downUpStandardDeviations;
-  std::vector<Sample> trainingSet;
-};
-
-struct Distance {
-  double downDown;
-  double upDown;
-  double downUp;
-};
-
-struct Threshold {
-  double downDown;
-  double upDown;
-  double downUp;
+struct Keystroke {
+  int keyCode;
+  double keyDownTime;
+  double keyUpTime;
 };
 
 std::vector<double> takeDownDownTimes(std::vector<Keystroke> keystrokes) {
@@ -63,16 +42,18 @@ std::vector<double> takeUpDownTimes(std::vector<Keystroke> keystrokes) {
 
 std::vector<double> takeDownUpTimes(std::vector<Keystroke> keystrokes) {
   std::vector<double> downUpTimes;
-  for (unsigned int i = 0; i < keystrokes.size(); i++) {
-    double downUpTime = keystrokes[i].keyUpTime - keystrokes[i].keyDownTime;
+  for (Keystroke keystroke : keystrokes) {
+    double downUpTime = keystroke.keyUpTime - keystroke.keyDownTime;
     downUpTimes.push_back(downUpTime);
   }
 
   return downUpTimes;
 }
 
-std::map<int, std::map<int, Sample>> summarizeKeystrokeData(int minimumSamples) {
-  std::map<int, std::map<int, Sample>> samples;
+typedef std::map<int, std::map<int, Sample>> SetSamples;
+
+SetSamples summarizeKeystrokeData(int minimumSamples) {
+  SetSamples samples;
 
   sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
   sql::PreparedStatement *preparedStatement;
@@ -81,7 +62,7 @@ std::map<int, std::map<int, Sample>> summarizeKeystrokeData(int minimumSamples) 
   connection = driver->connect(HOST, USER, PASSWORD);
   connection->setSchema("typing_dynamics_validator");
 
-  preparedStatement = connection->prepareStatement("SELECT user_id FROM sample GROUP BY user_id HAVING count(*) > ?;");
+  preparedStatement = connection->prepareStatement("SELECT user_id FROM sample GROUP BY user_id HAVING count(*) >= ?;");
   preparedStatement->setInt(1, minimumSamples);
   sql::ResultSet *userIDs = preparedStatement->executeQuery();
 
@@ -124,11 +105,19 @@ std::map<int, std::map<int, Sample>> summarizeKeystrokeData(int minimumSamples) 
   return samples;
 }
 
+// Profile
+struct Profile {
+  std::vector<double> downDownMeans;
+  std::vector<double> upDownMeans;
+  std::vector<double> downUpMeans;
+  std::vector<double> downDownStandardDeviations;
+  std::vector<double> upDownStandardDeviations;
+  std::vector<double> downUpStandardDeviations;
+};
+
 Profile takeProfile(std::vector<Sample> trainingSet) {
   Profile profile;
   double counter;
-
-  profile.trainingSet = trainingSet;
 
   // Means
   for (unsigned int i = 0; i < trainingSet[0].downDownTimes.size(); i++) {
@@ -177,6 +166,13 @@ Profile takeProfile(std::vector<Sample> trainingSet) {
   return profile;
 }
 
+// Classifier
+struct Distance {
+  double downDown;
+  double upDown;
+  double downUp;
+};
+
 Distance calculateDistance(Profile profile, Sample sample) {
   Distance distance;
   distance.downDown = 0;
@@ -197,6 +193,12 @@ Distance calculateDistance(Profile profile, Sample sample) {
 
   return distance;
 }
+
+struct Threshold {
+  double downDown;
+  double upDown;
+  double downUp;
+};
 
 Threshold determineThreshold(Profile profile) {
   Threshold threshold;
@@ -223,11 +225,12 @@ Threshold determineThreshold(Profile profile) {
   return threshold;
 }
 
-int main() {
-  std::map<int, std::map<int, Sample>> samples;
-  std::map<int, std::vector<Profile>> profiles;
+// *** MAIN FUNCTION *** //
 
-  samples = summarizeKeystrokeData(10);
+int main() {
+  SetSamples samples = summarizeKeystrokeData(10);
+
+  typedef std::map<int, std::vector<std::pair<std::vector<Sample>, Profile>>> SetProfiles;
 
   return 0;
 }
