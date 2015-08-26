@@ -2,3 +2,5 @@
 !.gitignore
 !*.cpp
 !*.pro
+!*.h
+config.h

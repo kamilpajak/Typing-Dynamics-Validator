@@ -225,35 +225,43 @@ Threshold determineThreshold(Profile profile) {
   return threshold;
 }
 
-std::vector<std::vector<Sample>> getSubsetsOfSamples(std::size_t samplesPerProfile, const std::map<int, Sample> &samples) {
-  if (samples.size() < samplesPerProfile)
+std::vector<std::map<int, Sample>> get_n_uplets(std::size_t n, const std::map<int, Sample> &samples) {
+  if (samples.size() < n) {
     return {};
+  }
+  std::vector<std::map<int, Sample>> res;
 
-  std::vector<std::vector<Sample>> subsets;
   auto first = samples.begin();
-  auto last = std::next(first, samplesPerProfile - 1);
+  auto last = std::next(first, n - 1);
 
   for (; last != samples.end(); ++first, ++last) {
-    std::vector<Sample> subset;
-    for (auto it = first; it != std::next(last); ++it)
-      subset.push_back(it->second);
-    subsets.push_back(subset);
-  }
+    std::map<int, Sample> inner;
 
-  return subsets;
+    for (auto it = first; it != std::next(last); ++it) {
+      inner[it->first] = it->second;
+    }
+    res.push_back(inner);
+  }
+  return res;
 }
 
 // *** MAIN FUNCTION *** //
 
 int main() {
-  typedef std::map<int, std::vector<std::pair<std::vector<int>, Profile>>> Profiles;
-
   int samplesPerProfile = 10;
   Samples samples = summarizeKeystrokeData(samplesPerProfile);
-  Profiles profiles;
+
+  std::map<int, std::vector<std::pair<std::vector<int>, Profile>>> profiles;
 
   for (const auto &userID_map : samples) {
-    std::vector<std::vector<Sample>> subsetsOfSamples = getSubsetsOfSamples(samplesPerProfile, userID_map.second);
+    std::vector<std::map<int, Sample>> subsets = get_n_uplets(samplesPerProfile, userID_map.second);
+    for (const auto &mapOfSamplesForProfile : subsets) {
+      std::vector<Sample> samplesForProfile;
+      for (const auto &sampleID_sample : mapOfSamplesForProfile)
+        samplesForProfile.push_back(sampleID_sample.second);
+//      profiles[userID_map.first] =
+      takeProfile(samplesForProfile);
+    }
   }
 
   return 0;
