@@ -5,9 +5,15 @@ CONFIG -= qt
 CONFIG += c++11
 
 SOURCES += validator.cpp \
-    user.cpp
+    user.cpp \
+    sample.cpp \
+    keystroke.cpp \
+    profile.cpp
 
 unix|win32: LIBS += -lmysqlcppconn
 
 HEADERS += \
-    user.h
+    user.h \
+    sample.h \
+    keystroke.h \
+    profile.h
