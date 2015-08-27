@@ -9,7 +9,7 @@
 class Sample {
 private:
   int id;
-  int userID;
+  int userId;
   std::string inputDevice;
   std::vector<Keystroke> keystrokes;
 
