@@ -17,6 +17,10 @@ private:
 
 public:
   User();
+  void setId(int id);
+  int getId() const;
+  void setUsername(std::string username);
+  std::string getUsername() const;
 };
 
 #endif // USER_H
