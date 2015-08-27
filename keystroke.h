@@ -1,9 +1,6 @@
 #ifndef KEYSTROKE_H
 #define KEYSTROKE_H
 
-#include <vector>
-#include <string>
-
 class Keystroke {
 private:
   int id;

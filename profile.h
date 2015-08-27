@@ -4,7 +4,6 @@
 #include "sample.h"
 
 #include <vector>
-#include <string>
 
 class Profile {
 private:

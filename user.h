@@ -4,15 +4,16 @@
 #include "sample.h"
 #include "profile.h"
 
-#include <vector>
 #include <string>
+#include <map>
+#include <list>
 
 class User {
 private:
   int id;
   std::string username;
-  std::vector<Sample> samples;
-  std::vector<Profile> profiles;
+  std::map<int, Sample> samples;
+  std::list<Profile> profiles;
 
 public:
   User();

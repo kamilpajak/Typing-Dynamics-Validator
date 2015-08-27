@@ -3,8 +3,8 @@
 
 #include "keystroke.h"
 
-#include <vector>
 #include <string>
+#include <vector>
 
 class Sample {
 private:
