@@ -1,26 +1,32 @@
 #ifndef KEYSTROKE_H
 #define KEYSTROKE_H
 
+#include <cppconn/resultset.h>
+
 class Keystroke {
 private:
   int id;
-  int sampleId;
   int keyCode;
   double keyDownTime;
   double keyUpTime;
+  int sampleId;
 
 public:
-  Keystroke();
+  Keystroke(sql::ResultSet *resultSet);
+
+  // Setters
   void setId(int id);
-  int getId() const;
-  void setSampleId(int sampleId);
-  int getSampleId() const;
   void setKeyCode(int keyCode);
-  int getKeyCode() const;
   void setKeyDownTime(double keyDownTime);
-  double getKeyDownTime() const;
   void setKeyUpTime(double keyUpTime);
+  void setSampleId(int sampleId);
+
+  // Getters
+  int getId() const;
+  int getKeyCode() const;
+  double getKeyDownTime() const;
   double getKeyUpTime() const;
+  int getSampleId() const;
 };
 
 #endif // KEYSTROKE_H

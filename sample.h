@@ -4,17 +4,22 @@
 #include "keystroke.h"
 
 #include <string>
-#include <vector>
+#include <map>
 
 class Sample {
 private:
   int id;
-  int userId;
   std::string inputDevice;
-  std::vector<Keystroke> keystrokes;
+  std::map<int, Keystroke> keystrokes;
+  int userId;
 
 public:
   Sample();
+  void setId(int id);
+  int getId() const;
+  void setInputDevice(std::string inputDevice);
+  std::string getInputDevice() const;
+
 };
 
 #endif // SAMPLE_H
