@@ -12,14 +12,18 @@ class User {
 private:
   int id;
   std::string username;
-  std::map<int, Sample> samples;
-  std::list<Profile> profiles;
+  std::map<int, Sample *> samples;
+  std::list<Profile *> profiles;
 
 public:
-  User();
+  User(sql::ResultSet *resultSet, std::map<int, Sample *> samples);
+
+  // Setters
   void setId(int id);
-  int getId() const;
   void setUsername(std::string username);
+
+  // Getters
+  int getId() const;
   std::string getUsername() const;
 };
 

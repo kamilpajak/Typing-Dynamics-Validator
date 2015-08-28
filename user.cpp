@@ -1,6 +1,9 @@
 #include "user.h"
 
-User::User() {
+User::User(sql::ResultSet *resultSet, std::map<int, Sample *> samples) {
+  this->id = resultSet->getInt("id");
+  this->username = resultSet->getString("username");
+  this->samples = samples;
 }
 
 void User::setId(int id) {

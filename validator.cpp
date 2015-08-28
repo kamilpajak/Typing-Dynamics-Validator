@@ -19,10 +19,12 @@ int main() {
 
   preparedStatement = connection->prepareStatement("SELECT * FROM user;");
   sql::ResultSet *fetchedUsers = preparedStatement->executeQuery();
+  std::map<int, User *> users;
   while (fetchedUsers->next()) {
     preparedStatement = connection->prepareStatement("SELECT * FROM sample WHERE user_id = ?");
     preparedStatement->setInt(1, fetchedUsers->getInt("id"));
     sql::ResultSet *fetchedSamples = preparedStatement->executeQuery();
+    std::map<int, Sample *> samples;
     while (fetchedSamples->next()) {
       preparedStatement = connection->prepareStatement("SELECT * FROM keystroke WHERE sample_id = ?");
       preparedStatement->setInt(1, fetchedSamples->getInt("id"));
@@ -32,12 +34,13 @@ int main() {
         Keystroke *keystroke = new Keystroke(fetchedKeystrokes);
         keystrokes[fetchedKeystrokes->getInt("id")] = keystroke;
       }
-      Sample sample;
-
       delete fetchedKeystrokes;
+      Sample *sample = new Sample(fetchedSamples, keystrokes);
+      samples[fetchedSamples->getInt("id")] = sample;
     }
-    User user;
     delete fetchedSamples;
+    User *user = new User(fetchedUsers, samples);
+    users[fetchedUsers->getInt("id")] = user;
   }
   delete fetchedUsers;
   delete preparedStatement;
