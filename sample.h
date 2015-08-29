@@ -4,7 +4,7 @@
 #include "keystroke.h"
 
 #include <string>
-#include <map>
+#include <vector>
 
 #include <cppconn/resultset.h>
 
@@ -12,19 +12,23 @@ class Sample {
 private:
   int id;
   std::string inputDevice;
-  std::map<int, Keystroke *> keystrokes;
+  std::vector<Keystroke*> keystrokes;
   int userId;
+  std::vector<double> downDownIntervals;
+  std::vector<double> upDownIntervals;
+  std::vector<double> downUpIntervals;
+
+  void calculateDownDownIntervals();
+  void calculateUpDownIntervals();
+  void calculateDownUpIntervals();
 
 public:
-  Sample(sql::ResultSet *resultSet, std::map<int, Keystroke *> keystrokes);
-
-  // Setters
-  void setId(int id);
-  void setInputDevice(std::string inputDevice);
+  Sample(sql::ResultSet* resultSet, std::vector<Keystroke*> keystrokes);
 
   // Getters
-  int getId() const;
-  std::string getInputDevice() const;
+  std::vector<double> getDownDownIntervals() const;
+  std::vector<double> getUpDownIntervals() const;
+  std::vector<double> getDownUpIntervals() const;
 };
 
 #endif // SAMPLE_H

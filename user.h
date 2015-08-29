@@ -5,18 +5,18 @@
 #include "profile.h"
 
 #include <string>
-#include <map>
-#include <list>
+#include <vector>
 
 class User {
 private:
   int id;
   std::string username;
-  std::map<int, Sample *> samples;
-  std::list<Profile *> profiles;
+  std::vector<Sample*> samples;
+  std::vector<Profile*> profiles;
+  std::size_t trainingSetSize = 10;
 
 public:
-  User(sql::ResultSet *resultSet, std::map<int, Sample *> samples);
+  User(sql::ResultSet* resultSet, std::vector<Sample*> samples);
 
   // Setters
   void setId(int id);

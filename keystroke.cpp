@@ -1,6 +1,6 @@
 #include "keystroke.h"
 
-Keystroke::Keystroke(sql::ResultSet *resultSet) {
+Keystroke::Keystroke(sql::ResultSet* resultSet) {
   this->id = resultSet->getInt("id");
   this->keyCode = resultSet->getInt("keyCode");
   this->keyDownTime = resultSet->getDouble("keyDownTime");

@@ -12,7 +12,7 @@ private:
   int sampleId;
 
 public:
-  Keystroke(sql::ResultSet *resultSet);
+  Keystroke(sql::ResultSet* resultSet);
 
   // Setters
   void setId(int id);
