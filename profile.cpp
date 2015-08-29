@@ -51,3 +51,28 @@ Profile::Profile(std::vector<Sample*> trainingSet) {
 
   this->trainingSet = trainingSet;
 }
+
+// Getters
+std::vector<double> Profile::getDownDownMeans() const {
+  return this->downDownMeans;
+}
+
+std::vector<double> Profile::getUpDownMeans() const {
+  return this->upDownMeans;
+}
+
+std::vector<double> Profile::getDownUpMeans() const {
+  return this->downUpMeans;
+}
+
+std::vector<double> Profile::getDownDownStandardDeviations() const {
+  return this->downDownStandardDeviations;
+}
+
+std::vector<double> Profile::getUpDownStandardDeviations() const {
+  return this->upDownStandardDeviations;
+}
+
+std::vector<double> Profile::getDownUpStandardDeviations() const {
+  return this->downUpStandardDeviations;
+}

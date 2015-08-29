@@ -13,7 +13,7 @@ private:
   std::string username;
   std::vector<Sample*> samples;
   std::vector<Profile*> profiles;
-  std::size_t trainingSetSize = 10;
+  std::size_t trainingSetSize;
 
 public:
   User(sql::ResultSet* resultSet, std::vector<Sample*> samples);

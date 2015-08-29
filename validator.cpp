@@ -46,5 +46,5 @@ int main() {
   delete fetchedUsers;
   delete preparedStatement;
   delete connection;
-  return 0;
+  return EXIT_SUCCESS;
 }

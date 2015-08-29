@@ -17,6 +17,14 @@ private:
 
 public:
   Profile(std::vector<Sample*> trainingSet);
+
+  // Getters
+  std::vector<double> getDownDownMeans() const;
+  std::vector<double> getUpDownMeans() const;
+  std::vector<double> getDownUpMeans() const;
+  std::vector<double> getDownDownStandardDeviations() const;
+  std::vector<double> getUpDownStandardDeviations() const;
+  std::vector<double> getDownUpStandardDeviations() const;
 };
 
 #endif // PROFILE_H

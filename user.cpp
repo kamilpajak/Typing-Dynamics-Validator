@@ -1,6 +1,7 @@
 #include "user.h"
 
 User::User(sql::ResultSet* resultSet, std::vector<Sample*> samples) {
+  this->trainingSetSize = 10;
   this->id = resultSet->getInt("id");
   this->username = resultSet->getString("username");
   this->samples = samples;

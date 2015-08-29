@@ -8,7 +8,9 @@ SOURCES += validator.cpp \
     user.cpp \
     sample.cpp \
     keystroke.cpp \
-    profile.cpp
+    profile.cpp \
+    distance.cpp \
+    threshold.cpp
 
 unix|win32: LIBS += -lmysqlcppconn
 
@@ -16,4 +18,6 @@ HEADERS += \
     user.h \
     sample.h \
     keystroke.h \
-    profile.h
+    profile.h \
+    distance.h \
+    threshold.h
