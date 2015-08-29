@@ -29,7 +29,7 @@ const std::string COMMAND_GET_INPUT_DEVICE_EVENT_NUMBER =
     "tr -d '\n'";
 
 std::string executeCommand(std::string command) {
-  FILE *pipe = popen(command.c_str(), "r");
+  FILE* pipe = popen(command.c_str(), "r");
   char buffer[128];
   std::string result = "";
   while (!feof(pipe))
@@ -49,7 +49,9 @@ std::string getInputDevicePath() {
 }
 
 // Raw events
-enum { KEY_RELEASED, KEY_PRESSED, KEY_REPEATED };
+enum { KEY_RELEASED,
+       KEY_PRESSED,
+       KEY_REPEATED };
 
 bool isEventValid(input_event event) {
   if (event.type == EV_KEY)
@@ -134,15 +136,15 @@ bool areKeyCodesCorrect(std::vector<Keystroke> providedKeystrokes) {
 // Database
 bool login(std::string username, std::string password) {
 
-  sql::mysql::MySQL_Driver *driver;
+  sql::mysql::MySQL_Driver* driver;
   driver = sql::mysql::get_mysql_driver_instance();
-  sql::Connection *connection;
+  sql::Connection* connection;
   connection = driver->connect(HOST, USER, PASSWORD);
   connection->setSchema("typing_dynamics_validator");
 
-  sql::Statement *statement;
+  sql::Statement* statement;
   statement = connection->createStatement();
-  sql::ResultSet *result;
+  sql::ResultSet* result;
   result = statement->executeQuery("SELECT * FROM user ORDER BY id ASC");
   bool isLogged = false;
   while (result->next()) {
@@ -160,15 +162,15 @@ bool login(std::string username, std::string password) {
 
 void uploadData(std::string username, std::string inputDeviceName,
                 std::vector<Keystroke> keystrokes) {
-  sql::mysql::MySQL_Driver *driver;
+  sql::mysql::MySQL_Driver* driver;
   driver = sql::mysql::get_mysql_driver_instance();
-  sql::Connection *connection;
+  sql::Connection* connection;
   connection = driver->connect(HOST, USER, PASSWORD);
   connection->setSchema("typing_dynamics_validator");
 
-  sql::Statement *statement;
+  sql::Statement* statement;
   statement = connection->createStatement();
-  sql::ResultSet *result;
+  sql::ResultSet* result;
   result = statement->executeQuery(
       std::string("SELECT id FROM user WHERE username = '" + username + "\'")
           .c_str());
@@ -177,7 +179,7 @@ void uploadData(std::string username, std::string inputDeviceName,
     userID = result->getInt("id");
 
   statement->execute("START TRANSACTION;");
-  sql::PreparedStatement *preparedStatement;
+  sql::PreparedStatement* preparedStatement;
   preparedStatement = connection->prepareStatement(
       "INSERT INTO sample(input_device, user_id) VALUES (?, ?)");
   preparedStatement->setString(1, inputDeviceName);
