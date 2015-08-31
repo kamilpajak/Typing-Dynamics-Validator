@@ -4,6 +4,7 @@
 #include "sample.h"
 #include "keystroke.h"
 #include "profile.h"
+#include "distance.h"
 
 #include <iostream>
 #include <algorithm>
@@ -11,32 +12,51 @@
 #include <mysql_driver.h>
 #include <cppconn/prepared_statement.h>
 
+bool isAuthenticated(Profile* profile, Sample* sample) {
+  Distance* distance = new Distance(profile, sample);
+  bool isDownDownConditionSatisfied = distance->getDownDown() <= profile->getDownDownThreshold();
+  bool isUpDownConditionSatisfied = distance->getUpDown() <= profile->getUpDownThreshold();
+  bool isDownUpConditionSatisfied = distance->getDownUp() <= profile->getDownUpThreshold();
+
+  return (isDownDownConditionSatisfied && isUpDownConditionSatisfied && isDownUpConditionSatisfied);
+}
+
 double calculateFalseAcceptanceRate(std::vector<User*> users) {
-  double falseAcceptanceRate = 0;
+  int trials = 0;
+  int falseAcceptances = 0;
   for (std::size_t i = 0; i < users.size(); i++)
     for (std::size_t j = 0; j < users.size(); j++)
       if (i != j)
         for (Profile* profile : users[i]->getProfiles())
           for (Sample* sample : users[j]->getSamples()) {
-            // Check FAR
+            if (isAuthenticated(profile, sample))
+              falseAcceptances++;
+            trials++;
           }
 
-  return falseAcceptanceRate;
+  std::cout << falseAcceptances << " / " << trials << " => " << (double)falseAcceptances / (double)trials * 100 << "% FAR" << std::endl;
+  ;
+  return (double)falseAcceptances / (double)trials;
 }
 
 double calculateFalseRejectionRate(std::vector<User*> users) {
-  double falseRejectionRate = 0;
+  int trials = 0;
+  int falseRejections = 0;
   for (User* user : users) {
     std::vector<Sample*> samples = user->getSamples();
     std::vector<Profile*> profiles = user->getProfiles();
-    for (std::size_t i = 0; i < profiles.size() - 1; i++) {
-      Sample* lastSampleOfTrainingSet = profiles[i]->getTrainingSet().back();
-      Sample* sample = samples[std::find(samples.begin(), samples.end(), lastSampleOfTrainingSet) - samples.begin() + 1];
-      // Check FRR
-    }
+    if (profiles.size() > 0)
+      for (std::size_t i = 0; i < profiles.size() - 1; i++) {
+        Sample* lastSampleOfTrainingSet = profiles[i]->getTrainingSet().back();
+        Sample* sample = samples[std::find(samples.begin(), samples.end(), lastSampleOfTrainingSet) - samples.begin() + 1];
+        if (!isAuthenticated(profiles[i], sample))
+          falseRejections++;
+        trials++;
+      }
   }
 
-  return falseRejectionRate;
+  std::cout << falseRejections << " / " << trials << " => " << (double)falseRejections / (double)trials * 100 << "% FRR" << std::endl;
+  return (double)falseRejections / (double)trials;
 }
 
 int main() {
@@ -79,6 +99,9 @@ int main() {
   // False acceptance and false rejection rates
   double lowestFalseAcceptanceRate = 0;
   double lowestFalseRejectionRate = 0;
+
+  calculateFalseAcceptanceRate(users);
+  calculateFalseRejectionRate(users);
 
   return EXIT_SUCCESS;
 }
