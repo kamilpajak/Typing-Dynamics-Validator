@@ -26,6 +26,10 @@ void Sample::calculateDownUpIntervals() {
 }
 
 // Getters
+int Sample::getId() const {
+  return this->id;
+}
+
 std::vector<double> Sample::getDownDownIntervals() const {
   return this->downDownIntervals;
 }

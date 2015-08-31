@@ -18,13 +18,11 @@ private:
 public:
   User(sql::ResultSet* resultSet, std::vector<Sample*> samples);
 
-  // Setters
-  void setId(int id);
-  void setUsername(std::string username);
-
   // Getters
   int getId() const;
   std::string getUsername() const;
+  std::vector<Sample*> getSamples() const;
+  std::vector<Profile*> getProfiles() const;
 };
 
 #endif // USER_H

@@ -26,6 +26,7 @@ public:
   Sample(sql::ResultSet* resultSet, std::vector<Keystroke*> keystrokes);
 
   // Getters
+  int getId() const;
   std::vector<double> getDownDownIntervals() const;
   std::vector<double> getUpDownIntervals() const;
   std::vector<double> getDownUpIntervals() const;

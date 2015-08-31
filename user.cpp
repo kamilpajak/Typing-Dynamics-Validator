@@ -18,20 +18,19 @@ User::User(sql::ResultSet* resultSet, std::vector<Sample*> samples) {
   }
 }
 
-// Setters
-void User::setId(int id) {
-  this->id = id;
-}
-
+// Getters
 int User::getId() const {
   return this->id;
 }
 
-// Getters
-void User::setUsername(std::string username) {
-  this->username = username;
-}
-
 std::string User::getUsername() const {
   return this->username;
+}
+
+std::vector<Sample*> User::getSamples() const {
+  return this->samples;
+}
+
+std::vector<Profile*> User::getProfiles() const {
+  return this->profiles;
 }

@@ -3,6 +3,7 @@
 #include <cmath>
 
 Profile::Profile(std::vector<Sample*> trainingSet) {
+  this->trainingSet = trainingSet;
   double counter;
 
   // Means
@@ -49,7 +50,21 @@ Profile::Profile(std::vector<Sample*> trainingSet) {
     this->downUpStandardDeviations.push_back(counter / (trainingSet.size() - 1));
   }
 
-  this->trainingSet = trainingSet;
+  // Thresholds
+  counter = 0;
+  for (std::size_t i = 0; i < this->downDownStandardDeviations.size(); i++)
+    counter += this->downDownStandardDeviations[i];
+  counter /= this->downDownStandardDeviations.size();
+
+  counter = 0;
+  for (std::size_t i = 0; i < this->upDownStandardDeviations.size(); i++)
+    counter += this->upDownStandardDeviations[i];
+  counter /= this->upDownStandardDeviations.size();
+
+  counter = 0;
+  for (std::size_t i = 0; i < this->downUpStandardDeviations.size(); i++)
+    counter += this->downUpStandardDeviations[i];
+  counter /= this->downUpStandardDeviations.size();
 }
 
 // Getters
@@ -75,4 +90,20 @@ std::vector<double> Profile::getUpDownStandardDeviations() const {
 
 std::vector<double> Profile::getDownUpStandardDeviations() const {
   return this->downUpStandardDeviations;
+}
+
+std::vector<Sample*> Profile::getTrainingSet() const {
+  return this->trainingSet;
+}
+
+double Profile::getDownDownThreshold() const {
+  return this->downDownThreshold;
+}
+
+double Profile::getUpDownThreshold() const {
+  return this->upDownThreshold;
+}
+
+double Profile::getDownUpThreshold() const {
+  return this->downUpThreshold;
 }
