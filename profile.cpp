@@ -2,6 +2,10 @@
 
 #include <cmath>
 
+double temp(double meanOfStandardDeviations) {
+  return meanOfStandardDeviations * 100;
+}
+
 Profile::Profile(std::vector<Sample*> trainingSet) {
   this->trainingSet = trainingSet;
   double counter;
@@ -55,16 +59,19 @@ Profile::Profile(std::vector<Sample*> trainingSet) {
   for (std::size_t i = 0; i < this->downDownStandardDeviations.size(); i++)
     counter += this->downDownStandardDeviations[i];
   counter /= this->downDownStandardDeviations.size();
+  this->downDownThreshold = temp(counter);
 
   counter = 0;
   for (std::size_t i = 0; i < this->upDownStandardDeviations.size(); i++)
     counter += this->upDownStandardDeviations[i];
   counter /= this->upDownStandardDeviations.size();
+  this->upDownThreshold = temp(counter);
 
   counter = 0;
   for (std::size_t i = 0; i < this->downUpStandardDeviations.size(); i++)
     counter += this->downUpStandardDeviations[i];
   counter /= this->downUpStandardDeviations.size();
+  this->downUpThreshold = temp(counter);
 }
 
 // Getters

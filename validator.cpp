@@ -35,7 +35,6 @@ double calculateFalseAcceptanceRate(std::vector<User*> users) {
           }
 
   std::cout << falseAcceptances << " / " << trials << " => " << (double)falseAcceptances / (double)trials * 100 << "% FAR" << std::endl;
-  ;
   return (double)falseAcceptances / (double)trials;
 }
 
