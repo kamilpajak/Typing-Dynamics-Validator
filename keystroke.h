@@ -14,13 +14,6 @@ private:
 public:
   Keystroke(sql::ResultSet* resultSet);
 
-  // Setters
-  void setId(int id);
-  void setKeyCode(int keyCode);
-  void setKeyDownTime(double keyDownTime);
-  void setKeyUpTime(double keyUpTime);
-  void setSampleId(int sampleId);
-
   // Getters
   int getId() const;
   int getKeyCode() const;

@@ -8,27 +8,6 @@ Keystroke::Keystroke(sql::ResultSet* resultSet) {
   this->sampleId = resultSet->getInt("sample_id");
 }
 
-// Setters
-void Keystroke::setId(int id) {
-  this->id = id;
-}
-
-void Keystroke::setKeyCode(int keyCode) {
-  this->keyCode = keyCode;
-}
-
-void Keystroke::setKeyDownTime(double keyDownTime) {
-  this->keyDownTime = keyDownTime;
-}
-
-void Keystroke::setKeyUpTime(double keyUpTime) {
-  this->keyUpTime = keyUpTime;
-}
-
-void Keystroke::setSampleId(int sampleId) {
-  this->sampleId = sampleId;
-}
-
 // Getters
 int Keystroke::getId() const {
   return this->id;

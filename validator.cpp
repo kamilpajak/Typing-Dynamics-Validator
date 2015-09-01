@@ -14,6 +14,7 @@
 
 bool isAuthenticated(Profile* profile, Sample* sample) {
   Distance* distance = new Distance(profile, sample);
+
   bool isDownDownConditionSatisfied = distance->getDownDown() <= profile->getDownDownThreshold();
   bool isUpDownConditionSatisfied = distance->getUpDown() <= profile->getUpDownThreshold();
   bool isDownUpConditionSatisfied = distance->getDownUp() <= profile->getDownUpThreshold();
@@ -44,7 +45,7 @@ double calculateFalseRejectionRate(std::vector<User*> users) {
   for (User* user : users) {
     std::vector<Sample*> samples = user->getSamples();
     std::vector<Profile*> profiles = user->getProfiles();
-    if (profiles.size() > 0)
+    if (!profiles.empty())
       for (std::size_t i = 0; i < profiles.size() - 1; i++) {
         Sample* lastSampleOfTrainingSet = profiles[i]->getTrainingSet().back();
         Sample* sample = samples[std::find(samples.begin(), samples.end(), lastSampleOfTrainingSet) - samples.begin() + 1];
