@@ -13,10 +13,10 @@ private:
   std::vector<double> downDownStandardDeviations;
   std::vector<double> upDownStandardDeviations;
   std::vector<double> downUpStandardDeviations;
-  std::vector<Sample*> trainingSet;
   double downDownMeanDeviation;
   double upDownMeanDeviation;
   double downUpMeanDeviation;
+  std::vector<Sample*> trainingSet;
 
 public:
   Profile(std::vector<Sample*> trainingSet);
@@ -28,10 +28,10 @@ public:
   std::vector<double> getDownDownStandardDeviations() const;
   std::vector<double> getUpDownStandardDeviations() const;
   std::vector<double> getDownUpStandardDeviations() const;
-  std::vector<Sample*> getTrainingSet() const;
   double getDownDownMeanDeviation() const;
   double getUpDownMeanDeviation() const;
   double getDownUpMeanDeviation() const;
+  std::vector<Sample*> getTrainingSet() const;
 };
 
 #endif // PROFILE_H

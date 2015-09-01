@@ -1,26 +1,16 @@
 #include "config.h"
 
 #include "user.h"
+#include "profile.h"
 #include "sample.h"
 #include "keystroke.h"
-#include "profile.h"
-#include "distance.h"
+#include "classifier.h"
 
 #include <iostream>
 #include <algorithm>
 
 #include <mysql_driver.h>
 #include <cppconn/prepared_statement.h>
-
-bool isAuthenticated(Profile* profile, Sample* sample) {
-  Distance* distance = new Distance(profile, sample);
-
-  bool isDownDownConditionSatisfied = distance->getDownDown() <= profile->getDownDownThreshold();
-  bool isUpDownConditionSatisfied = distance->getUpDown() <= profile->getUpDownThreshold();
-  bool isDownUpConditionSatisfied = distance->getDownUp() <= profile->getDownUpThreshold();
-
-  return (isDownDownConditionSatisfied && isUpDownConditionSatisfied && isDownUpConditionSatisfied);
-}
 
 double calculateFalseAcceptanceRate(std::vector<User*> users) {
   int trials = 0;
@@ -30,7 +20,8 @@ double calculateFalseAcceptanceRate(std::vector<User*> users) {
       if (i != j)
         for (Profile* profile : users[i]->getProfiles())
           for (Sample* sample : users[j]->getSamples()) {
-            if (isAuthenticated(profile, sample))
+            Classifier* classifier = new Classifier(profile, sample);
+            if (classifier->isValidSample())
               falseAcceptances++;
             trials++;
           }
@@ -49,7 +40,8 @@ double calculateFalseRejectionRate(std::vector<User*> users) {
       for (std::size_t i = 0; i < profiles.size() - 1; i++) {
         Sample* lastSampleOfTrainingSet = profiles[i]->getTrainingSet().back();
         Sample* sample = samples[std::find(samples.begin(), samples.end(), lastSampleOfTrainingSet) - samples.begin() + 1];
-        if (!isAuthenticated(profiles[i], sample))
+        Classifier* classifier = new Classifier(profiles[i], sample);
+        if (!classifier->isValidSample())
           falseRejections++;
         trials++;
       }
