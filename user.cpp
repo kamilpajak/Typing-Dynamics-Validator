@@ -1,36 +1,36 @@
 #include "user.h"
 
 User::User(sql::ResultSet* resultSet, std::vector<Sample*> samples) {
-  this->trainingSetSize = 10;
-  this->id = resultSet->getInt("id");
-  this->username = resultSet->getString("username");
-  this->samples = samples;
+  this->trainingSetSize_ = 10;
+  this->id_ = resultSet->getInt("id");
+  this->username_ = resultSet->getString("username");
+  this->samples_ = samples;
 
-  if (this->samples.size() >= this->trainingSetSize) {
+  if (this->samples_.size() >= this->trainingSetSize_) {
     std::vector<Sample*> trainingSet;
-    for (std::size_t i = 0; i <= this->samples.size() - this->trainingSetSize; i++) {
+    for (std::size_t i = 0; i <= this->samples_.size() - this->trainingSetSize_; i++) {
       trainingSet.clear();
-      for (std::size_t j = i; j < i + this->trainingSetSize; j++)
-        trainingSet.push_back(this->samples[j]);
+      for (std::size_t j = i; j < i + this->trainingSetSize_; j++)
+        trainingSet.push_back(this->samples_[j]);
       Profile* profile = new Profile(trainingSet);
-      this->profiles.push_back(profile);
+      this->profiles_.push_back(profile);
     }
   }
 }
 
 // Getters
 int User::getId() const {
-  return this->id;
+  return this->id_;
 }
 
 std::string User::getUsername() const {
-  return this->username;
+  return this->username_;
 }
 
 std::vector<Sample*> User::getSamples() const {
-  return this->samples;
+  return this->samples_;
 }
 
 std::vector<Profile*> User::getProfiles() const {
-  return this->profiles;
+  return this->profiles_;
 }

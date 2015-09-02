@@ -5,11 +5,11 @@
 
 class Keystroke {
 private:
-  int id;
-  int keyCode;
-  double keyDownTime;
-  double keyUpTime;
-  int sampleId;
+  int id_;
+  int keyCode_;
+  double keyDownTime_;
+  double keyUpTime_;
+  int sampleId_;
 
 public:
   Keystroke(sql::ResultSet* resultSet);

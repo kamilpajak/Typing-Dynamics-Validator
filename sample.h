@@ -10,13 +10,13 @@
 
 class Sample {
 private:
-  int id;
-  std::string inputDevice;
-  int userId;
-  std::vector<double> downDownIntervals;
-  std::vector<double> upDownIntervals;
-  std::vector<double> downUpIntervals;
-  std::vector<Keystroke*> keystrokes;
+  int id_;
+  std::string inputDevice_;
+  int userId_;
+  std::vector<double> downDownIntervals_;
+  std::vector<double> upDownIntervals_;
+  std::vector<double> downUpIntervals_;
+  std::vector<Keystroke*> keystrokes_;
 
   void calculateDownDownIntervals();
   void calculateUpDownIntervals();

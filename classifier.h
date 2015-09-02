@@ -6,13 +6,13 @@
 
 class Classifier {
 private:
-  double downDownDistance;
-  double upDownDistance;
-  double downUpDistance;
-  double downDownThreshold;
-  double upDownThreshold;
-  double downUpThreshold;
-  bool isValid;
+  double downDownDistance_;
+  double upDownDistance_;
+  double downUpDistance_;
+  double downDownThreshold_;
+  double upDownThreshold_;
+  double downUpThreshold_;
+  bool isValid_;
 
 public:
   Classifier(Profile* profile, Sample* sample);
@@ -22,7 +22,7 @@ public:
   double getDownDownThreshold() const;
   double getUpDownThreshold() const;
   double getDownUpThreshold() const;
-  bool isValidSample() const;
+  bool isValid() const;
 };
 
 #endif // CLASSIFIER_H

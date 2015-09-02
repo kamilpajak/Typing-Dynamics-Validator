@@ -21,7 +21,7 @@ double calculateFalseAcceptanceRate(std::vector<User*> users) {
         for (Profile* profile : users[i]->getProfiles())
           for (Sample* sample : users[j]->getSamples()) {
             Classifier* classifier = new Classifier(profile, sample);
-            if (classifier->isValidSample())
+            if (classifier->isValid())
               falseAcceptances++;
             trials++;
           }
@@ -41,7 +41,7 @@ double calculateFalseRejectionRate(std::vector<User*> users) {
         Sample* lastSampleOfTrainingSet = profiles[i]->getTrainingSet().back();
         Sample* sample = samples[std::find(samples.begin(), samples.end(), lastSampleOfTrainingSet) - samples.begin() + 1];
         Classifier* classifier = new Classifier(profiles[i], sample);
-        if (!classifier->isValidSample())
+        if (!classifier->isValid())
           falseRejections++;
         trials++;
       }

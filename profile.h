@@ -7,16 +7,16 @@
 
 class Profile {
 private:
-  std::vector<double> downDownMeans;
-  std::vector<double> upDownMeans;
-  std::vector<double> downUpMeans;
-  std::vector<double> downDownStandardDeviations;
-  std::vector<double> upDownStandardDeviations;
-  std::vector<double> downUpStandardDeviations;
-  double downDownMeanDeviation;
-  double upDownMeanDeviation;
-  double downUpMeanDeviation;
-  std::vector<Sample*> trainingSet;
+  std::vector<double> downDownMeans_;
+  std::vector<double> upDownMeans_;
+  std::vector<double> downUpMeans_;
+  std::vector<double> downDownStandardDeviations_;
+  std::vector<double> upDownStandardDeviations_;
+  std::vector<double> downUpStandardDeviations_;
+  double downDownMeanDeviation_;
+  double upDownMeanDeviation_;
+  double downUpMeanDeviation_;
+  std::vector<Sample*> trainingSet_;
 
 public:
   Profile(std::vector<Sample*> trainingSet);
