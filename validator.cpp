@@ -12,7 +12,7 @@
 #include <mysql_driver.h>
 #include <cppconn/prepared_statement.h>
 
-double calculateFalseAcceptanceRate(std::vector<User*> users) {
+double calculateFalseAcceptanceRate(std::vector<User*> users, std::pair<double, double> thresholdParameters) {
   int trials = 0;
   int falseAcceptances = 0;
   for (std::size_t i = 0; i < users.size(); i++)
@@ -21,16 +21,16 @@ double calculateFalseAcceptanceRate(std::vector<User*> users) {
         for (Profile* profile : users[i]->getProfiles())
           for (Sample* sample : users[j]->getSamples()) {
             Classifier* classifier = new Classifier(profile, sample);
-            if (classifier->isValid())
+            classifier->setDownDownThreshold(profile, thresholdParameters.first, thresholdParameters.second);
+            if (classifier->isDownDownValid())
               falseAcceptances++;
             trials++;
           }
 
-  std::cout << falseAcceptances << " / " << trials << " => " << (double)falseAcceptances / (double)trials * 100 << "% FAR" << std::endl;
   return (double)falseAcceptances / (double)trials;
 }
 
-double calculateFalseRejectionRate(std::vector<User*> users) {
+double calculateFalseRejectionRate(std::vector<User*> users, std::pair<double, double> thresholdParameters) {
   int trials = 0;
   int falseRejections = 0;
   for (User* user : users) {
@@ -41,14 +41,39 @@ double calculateFalseRejectionRate(std::vector<User*> users) {
         Sample* lastSampleOfTrainingSet = profiles[i]->getTrainingSet().back();
         Sample* sample = samples[std::find(samples.begin(), samples.end(), lastSampleOfTrainingSet) - samples.begin() + 1];
         Classifier* classifier = new Classifier(profiles[i], sample);
-        if (!classifier->isValid())
+        classifier->setDownDownThreshold(profiles[i], thresholdParameters.first, thresholdParameters.second);
+        if (!classifier->isDownDownValid())
           falseRejections++;
         trials++;
       }
   }
 
-  std::cout << falseRejections << " / " << trials << " => " << (double)falseRejections / (double)trials * 100 << "% FRR" << std::endl;
   return (double)falseRejections / (double)trials;
+}
+
+std::pair<double, double> findBestThresholdParameters(std::vector<User*> users) {
+  double currentFar;
+  double currentFrr;
+  double lastFar = 100;
+  double lastFrr = 100;
+
+  std::pair<double, double> bestThresholdParameters;
+
+  for (int i = 0; i < 5; i++) {
+    for (int j = 0; j < 5; j++) {
+      std::pair<double, double> thresholdParameters;
+      thresholdParameters.first = i * -1;
+      thresholdParameters.second = j / 3;
+      currentFar = calculateFalseAcceptanceRate(users, thresholdParameters);
+      currentFrr = calculateFalseRejectionRate(users, thresholdParameters);
+      if (currentFar + currentFrr < lastFar + lastFrr)
+        bestThresholdParameters = thresholdParameters;
+      lastFar = currentFar;
+      lastFrr = currentFrr;
+    }
+  }
+  std::cout << bestThresholdParameters.first << ":" << bestThresholdParameters.second;
+  return bestThresholdParameters;
 }
 
 int main() {
@@ -88,12 +113,7 @@ int main() {
   delete preparedStatement;
   delete connection;
 
-  // False acceptance and false rejection rates
-  double lowestFalseAcceptanceRate = 0;
-  double lowestFalseRejectionRate = 0;
-
-  calculateFalseAcceptanceRate(users);
-  calculateFalseRejectionRate(users);
+  findBestThresholdParameters(users);
 
   return EXIT_SUCCESS;
 }

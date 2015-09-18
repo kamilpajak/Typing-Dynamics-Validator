@@ -12,17 +12,22 @@ private:
   double downDownThreshold_;
   double upDownThreshold_;
   double downUpThreshold_;
-  bool isValid_;
 
 public:
   Classifier(Profile* profile, Sample* sample);
+  void setDownDownThreshold(Profile* profile, double a, double b);
+  void setUpDownThreshold(Profile* profile, double a, double b);
+  void setDownUpThreshold(Profile* profile, double a, double b);
   double getDownDownDistance() const;
   double getUpDownDistance() const;
   double getDownUpDistance() const;
   double getDownDownThreshold() const;
   double getUpDownThreshold() const;
   double getDownUpThreshold() const;
-  bool isValid() const;
+  bool isValid();
+  bool isDownDownValid();
+  bool isUpDownValid();
+  bool isDownUpValid();
 };
 
 #endif // CLASSIFIER_H

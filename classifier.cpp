@@ -1,5 +1,7 @@
 #include "classifier.h"
 
+#include <cmath>
+
 Classifier::Classifier(Profile* profile, Sample* sample) {
   // Distances
   this->downDownDistance_ = 0;
@@ -7,26 +9,29 @@ Classifier::Classifier(Profile* profile, Sample* sample) {
   this->downUpDistance_ = 0;
 
   for (std::size_t i = 0; i < sample->getDownDownIntervals().size(); i++)
-    this->downDownDistance_ += (sample->getDownDownIntervals()[i] - profile->getDownDownMeans()[i]) / profile->getDownDownStandardDeviations()[i];
+    this->downDownDistance_ += std::abs(sample->getDownDownIntervals()[i] - profile->getDownDownMeans()[i]) / profile->getDownDownStandardDeviations()[i];
   this->downDownDistance_ /= sample->getDownDownIntervals().size();
 
   for (std::size_t i = 0; i < sample->getUpDownIntervals().size(); i++)
-    this->upDownDistance_ += (sample->getUpDownIntervals()[i] - profile->getUpDownMeans()[i]) / profile->getUpDownStandardDeviations()[i];
+    this->upDownDistance_ += std::abs(sample->getUpDownIntervals()[i] - profile->getUpDownMeans()[i]) / profile->getUpDownStandardDeviations()[i];
   this->upDownDistance_ /= sample->getUpDownIntervals().size();
 
   for (std::size_t i = 0; i < sample->getDownUpIntervals().size(); i++)
-    this->downUpDistance_ += (sample->getDownUpIntervals()[i] - profile->getDownUpMeans()[i]) / profile->getDownUpStandardDeviations()[i];
+    this->downUpDistance_ += std::abs(sample->getDownUpIntervals()[i] - profile->getDownUpMeans()[i]) / profile->getDownUpStandardDeviations()[i];
   this->downUpDistance_ /= sample->getDownUpIntervals().size();
+}
 
-  // Thresholds
-  this->downDownThreshold_ = profile->getDownDownMeanDeviation() * 100;
-  this->upDownThreshold_ = profile->getUpDownMeanDeviation() * 100;
-  this->downUpThreshold_ = profile->getDownUpMeanDeviation() * 100;
+// Setters
+void Classifier::setDownDownThreshold(Profile* profile, double a, double b) {
+  this->downDownThreshold_ = a * profile->getDownDownMeanDeviation() + b;
+}
 
-  // Validate
-  this->isValid_ = (this->downDownDistance_ <= this->downDownThreshold_ &&
-                    this->upDownDistance_ <= this->upDownThreshold_ &&
-                    this->downUpDistance_ <= this->downUpThreshold_);
+void Classifier::setUpDownThreshold(Profile* profile, double a, double b) {
+  this->upDownThreshold_ = a * profile->getUpDownMeanDeviation() + b;
+}
+
+void Classifier::setDownUpThreshold(Profile* profile, double a, double b) {
+  this->downUpThreshold_ = a * profile->getDownUpMeanDeviation() + b;
 }
 
 // Getters
@@ -54,6 +59,18 @@ double Classifier::getDownUpThreshold() const {
   return this->downUpThreshold_;
 }
 
-bool Classifier::isValid() const {
-  return this->isValid_;
+bool Classifier::isValid() {
+  return this->isDownDownValid() && this->isUpDownValid() && this->isDownUpValid();
+}
+
+bool Classifier::isDownDownValid() {
+  return this->downDownDistance_ <= this->downDownThreshold_;
+}
+
+bool Classifier::isUpDownValid() {
+  return this->upDownDistance_ <= this->upDownThreshold_;
+}
+
+bool Classifier::isDownUpValid() {
+  return this->downUpDistance_ <= this->downUpThreshold_;
 }
