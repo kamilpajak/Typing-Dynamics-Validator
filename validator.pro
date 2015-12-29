@@ -19,3 +19,5 @@ HEADERS += \
     keystroke.h \
     profile.h \
     classifier.h
+
+unix|win32: LIBS += -lncurses
