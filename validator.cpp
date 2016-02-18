@@ -161,23 +161,6 @@ std::pair<double, double> findBestThresholdParameters(std::vector<Comparison> co
     a += incrementA;
   }
 
-//  falseAcceptances = 0;
-//  falseRejections = 0;
-
-//  for (Comparison comparison : comparisons) {
-//    double threshold = bestThresholdParameters.first * comparison.featureMeanDeviation + bestThresholdParameters.second;
-//    if (comparison.distance <= threshold && comparison.isLegitimate == false)
-//      falseAcceptances++;
-//    if (comparison.distance > threshold && comparison.isLegitimate == true)
-//      falseRejections++;
-//  }
-
-//  double FAR = (double)falseAcceptances / (double)impostorAttempts * 100;
-//  double FRR = (double)falseRejections / (double)legitimateUserAttempts * 100;
-
-  //  std::cout << "  False Acceptance Rate: " << FAR << "%\n";
-  //  std::cout << "  False Rejection Rate: " << FRR << "%\n";
-
   return bestThresholdParameters;
 }
 
